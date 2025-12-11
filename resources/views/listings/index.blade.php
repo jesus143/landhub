@@ -252,9 +252,20 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="{{ route('listings.show', $listing) }}" class="block w-full text-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
-                                        View Details
-                                    </a>
+                                    <div class="flex gap-3">
+                                        <a href="{{ route('listings.show', $listing) }}" class="flex-1 text-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
+                                            View Details
+                                        </a>
+                                        @if($listing->contact_fb_link)
+                                            <a href="{{ $listing->contact_fb_link }}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8 12.05a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM12 12.05a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12zm10-8a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
+                                                </svg>
+                                                Messenger
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         @endforeach

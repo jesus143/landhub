@@ -27,6 +27,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'White Beach, D\'Mall, Station 2',
                 'contact_phone' => '+63 917 123 4567',
                 'contact_email' => 'boracay@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Agricultural Land in Laguna',
@@ -42,6 +43,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Calamba City, Pagsanjan Falls',
                 'contact_phone' => '+63 917 234 5678',
                 'contact_email' => 'laguna@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Commercial Lot in Makati',
@@ -57,6 +59,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Ayala Avenue, Greenbelt Mall',
                 'contact_phone' => '+63 917 345 6789',
                 'contact_email' => 'makati@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Mountain View Property in Baguio',
@@ -72,6 +75,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Burnham Park, Session Road',
                 'contact_phone' => '+63 917 456 7890',
                 'contact_email' => 'baguio@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Rice Farm in Nueva Ecija',
@@ -87,6 +91,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Cabanatuan City, Palayan City',
                 'contact_phone' => '+63 917 567 8901',
                 'contact_email' => 'nuevaecija@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Residential Lot in Cebu',
@@ -102,6 +107,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Ayala Center, SM City Cebu',
                 'contact_phone' => '+63 917 678 9012',
                 'contact_email' => 'cebu@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Beachfront Land in Palawan',
@@ -117,6 +123,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Puerto Princesa, El Nido',
                 'contact_phone' => '+63 917 789 0123',
                 'contact_email' => 'palawan@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
             [
                 'title' => 'Farmland in Davao',
@@ -132,6 +139,7 @@ class ListingSeeder extends Seeder
                 'nearby_landmarks' => 'Davao City, Mount Apo',
                 'contact_phone' => '+63 917 890 1234',
                 'contact_email' => 'davao@landhub.com',
+                'contact_fb_link' => 'https://www.facebook.com/messages/t/27749926061319029',
             ],
         ];
 
