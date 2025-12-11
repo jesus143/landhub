@@ -19,7 +19,13 @@
             @theme {
                 --color-clifford: #da373d;
             }
-            </style>
+
+            .d-none {
+                display: none;
+            }
+
+
+        </style>
 
     </head>
     <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen">
@@ -47,20 +53,23 @@
                                 Dashboard
                             </a>
                         @else
-                            <a
-                                href="{{ route('login') }}"
-                                class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-                            >
-                                Log in
-                            </a>
-                            @if (Route::has('register'))
+
+                            <div class="d-none">
                                 <a
-                                    href="{{ route('register') }}"
-                                    class="px-6 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm"
+                                    href="{{ route('login') }}"
+                                    class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                                 >
-                                    Sign Up
+                                    Log in
                                 </a>
-                            @endif
+                                @if (Route::has('register'))
+                                    <a
+                                        href="{{ route('register') }}"
+                                        class="px-6 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm"
+                                    >
+                                        Sign Up
+                                    </a>
+                                @endif
+                            </div>
                         @endauth
                     </div>
 
@@ -91,20 +100,24 @@
                                 Dashboard
                             </a>
                         @else
-                            <a
-                                href="{{ route('login') }}"
-                                class="px-4 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                            >
-                                Log in
-                            </a>
-                            @if (Route::has('register'))
+
+                            <div class="d-none">
                                 <a
-                                    href="{{ route('register') }}"
-                                    class="px-4 py-2 text-base font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm text-center"
+                                    href="{{ route('login') }}"
+                                    class="px-4 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                                 >
-                                    Sign Up
+                                    Log in
                                 </a>
-                            @endif
+                                @if (Route::has('register'))
+                                    <a
+                                        href="{{ route('register') }}"
+                                        class="px-4 py-2 text-base font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm text-center"
+                                    >
+                                        Sign Up
+                                    </a>
+                                @endif
+
+                            </div>
                         @endauth
                     </div>
                 </div>
@@ -320,13 +333,15 @@
                         Browse All Listings
                     </a>
                     @if (Route::has('register'))
+
+
                         <a
                             href="{{ route('register') }}"
-                            class="px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-lg border-2 border-white/20"
+                            class="d-none px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-lg border-2 border-white/20"
                         >
                             Create Free Account
                         </a>
-        @endif
+                    @endif
                 </div>
             </div>
         </section>
