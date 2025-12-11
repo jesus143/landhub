@@ -1,0 +1,142 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Listing;
+use Illuminate\Database\Seeder;
+
+class ListingSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $listings = [
+            [
+                'title' => 'Beachfront Property in Boracay',
+                'description' => 'Stunning beachfront land with white sand beach access. Perfect for resort development or private villa.',
+                'price' => 15000000,
+                'area' => 500,
+                'location' => 'Boracay, Aklan',
+                'category' => 'residential',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+                'latitude' => 11.9674,
+                'longitude' => 121.9248,
+                'nearby_landmarks' => 'White Beach, D\'Mall, Station 2',
+                'contact_phone' => '+63 917 123 4567',
+                'contact_email' => 'boracay@landhub.com',
+            ],
+            [
+                'title' => 'Agricultural Land in Laguna',
+                'description' => 'Fertile agricultural land suitable for farming. Has irrigation system and road access.',
+                'price' => 3500000,
+                'area' => 2000,
+                'location' => 'Laguna',
+                'category' => 'agricultural',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop',
+                'latitude' => 14.2685,
+                'longitude' => 121.4663,
+                'nearby_landmarks' => 'Calamba City, Pagsanjan Falls',
+                'contact_phone' => '+63 917 234 5678',
+                'contact_email' => 'laguna@landhub.com',
+            ],
+            [
+                'title' => 'Commercial Lot in Makati',
+                'description' => 'Prime commercial location in business district. High foot traffic area, perfect for retail or office building.',
+                'price' => 25000000,
+                'area' => 300,
+                'location' => 'Makati, Manila',
+                'category' => 'commercial',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop',
+                'latitude' => 14.5547,
+                'longitude' => 121.0244,
+                'nearby_landmarks' => 'Ayala Avenue, Greenbelt Mall',
+                'contact_phone' => '+63 917 345 6789',
+                'contact_email' => 'makati@landhub.com',
+            ],
+            [
+                'title' => 'Mountain View Property in Baguio',
+                'description' => 'Cool climate property with panoramic mountain views. Ideal for vacation home or retirement.',
+                'price' => 8500000,
+                'area' => 800,
+                'location' => 'Baguio',
+                'category' => 'residential',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
+                'latitude' => 16.4023,
+                'longitude' => 120.5960,
+                'nearby_landmarks' => 'Burnham Park, Session Road',
+                'contact_phone' => '+63 917 456 7890',
+                'contact_email' => 'baguio@landhub.com',
+            ],
+            [
+                'title' => 'Rice Farm in Nueva Ecija',
+                'description' => 'Large rice farm with established irrigation. Includes farmhouse and storage facilities.',
+                'price' => 4200000,
+                'area' => 5000,
+                'location' => 'Nueva Ecija',
+                'category' => 'agricultural',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop',
+                'latitude' => 15.5784,
+                'longitude' => 120.9886,
+                'nearby_landmarks' => 'Cabanatuan City, Palayan City',
+                'contact_phone' => '+63 917 567 8901',
+                'contact_email' => 'nuevaecija@landhub.com',
+            ],
+            [
+                'title' => 'Residential Lot in Cebu',
+                'description' => 'Corner lot in gated subdivision. Near schools and shopping centers. Ready for construction.',
+                'price' => 5500000,
+                'area' => 400,
+                'location' => 'Cebu',
+                'category' => 'residential',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop',
+                'latitude' => 10.3157,
+                'longitude' => 123.8854,
+                'nearby_landmarks' => 'Ayala Center, SM City Cebu',
+                'contact_phone' => '+63 917 678 9012',
+                'contact_email' => 'cebu@landhub.com',
+            ],
+            [
+                'title' => 'Beachfront Land in Palawan',
+                'description' => 'Pristine beachfront property with crystal clear waters. Perfect for eco-tourism or private resort.',
+                'price' => 18000000,
+                'area' => 1200,
+                'location' => 'Palawan',
+                'category' => 'commercial',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
+                'latitude' => 9.8349,
+                'longitude' => 118.7384,
+                'nearby_landmarks' => 'Puerto Princesa, El Nido',
+                'contact_phone' => '+63 917 789 0123',
+                'contact_email' => 'palawan@landhub.com',
+            ],
+            [
+                'title' => 'Farmland in Davao',
+                'description' => 'Spacious farmland ideal for fruit trees and crops. Has water source and electricity.',
+                'price' => 4800000,
+                'area' => 3500,
+                'location' => 'Davao',
+                'category' => 'agricultural',
+                'status' => 'for_sale',
+                'image_url' => 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop',
+                'latitude' => 7.1907,
+                'longitude' => 125.4553,
+                'nearby_landmarks' => 'Davao City, Mount Apo',
+                'contact_phone' => '+63 917 890 1234',
+                'contact_email' => 'davao@landhub.com',
+            ],
+        ];
+
+        foreach ($listings as $listing) {
+            Listing::create($listing);
+        }
+    }
+}
