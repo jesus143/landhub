@@ -257,13 +257,13 @@
                                             View Details
                                         </a>
                                         @if($listing->contact_fb_link)
-                                            <a href="{{ $listing->contact_fb_link }}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                                            <button onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                     <path d="M8 12.05a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM12 12.05a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
                                                     <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12zm10-8a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
                                                 </svg>
                                                 Messenger
-                                            </a>
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -291,6 +291,29 @@
         </section>
 
         <script>
+            function openMessenger(fbLink) {
+                // Extract user ID from Facebook link (format: https://www.facebook.com/messages/t/USER_ID)
+                const userId = fbLink.split('/').pop();
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    // Try to open Messenger app on mobile, fallback to web if app not installed
+                    const messengerAppUrl = `fb-messenger://user/${userId}`;
+                    const messengerWebUrl = `https://m.facebook.com/messages/t/${userId}`;
+
+                    // Try opening the app
+                    window.location.href = messengerAppUrl;
+
+                    // Fallback to web version after a short delay
+                    setTimeout(function() {
+                        window.open(messengerWebUrl, '_blank');
+                    }, 1000);
+                } else {
+                    // Desktop: open in new tab
+                    window.open(fbLink, '_blank');
+                }
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
                 const mobileMenuButton = document.getElementById('mobile-menu-button');
                 const mobileMenu = document.getElementById('mobile-menu');
