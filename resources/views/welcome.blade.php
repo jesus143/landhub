@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Find your perfect land with LandHub. Browse thousands of verified listings for residential, agricultural, and commercial properties across the Philippines.">
 
         <title>LandHub - Find Your Perfect Land</title>
 
@@ -20,12 +21,7 @@
                 --color-clifford: #da373d;
             }
 
-            .d-none {
-                display: none;
-            }
-
-
-        </style>
+            </style>
 
     </head>
     <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen">
@@ -45,31 +41,13 @@
 
                     <!-- Desktop Navigation -->
                     <div class="hidden md:flex items-center gap-4">
-                        @auth
-                            <a
-                                href="{{ url('/dashboard') }}"
+                    @auth
+                        <a
+                            href="{{ url('/dashboard') }}"
                                 class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-                            >
-                                Dashboard
-                            </a>
-                        @else
-
-                            <div class="d-none">
-                                <a
-                                    href="{{ route('login') }}"
-                                    class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-                                >
-                                    Log in
-                                </a>
-                                @if (Route::has('register'))
-                                    <a
-                                        href="{{ route('register') }}"
-                                        class="px-6 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm"
-                                    >
-                                        Sign Up
-                                    </a>
-                                @endif
-                            </div>
+                        >
+                            Dashboard
+                        </a>
                         @endauth
                     </div>
 
@@ -99,29 +77,10 @@
                             >
                                 Dashboard
                             </a>
-                        @else
-
-                            <div class="d-none">
-                                <a
-                                    href="{{ route('login') }}"
-                                    class="px-4 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                                >
-                                    Log in
-                                </a>
-                                @if (Route::has('register'))
-                                    <a
-                                        href="{{ route('register') }}"
-                                        class="px-4 py-2 text-base font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm text-center"
-                                    >
-                                        Sign Up
-                                    </a>
-                                @endif
-
-                            </div>
-                        @endauth
+                    @endauth
                     </div>
                 </div>
-            </nav>
+                </nav>
         </header>
 
         <script>
@@ -192,7 +151,7 @@
                         >
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                                    </svg>
                             Browse All Listings
                         </a>
                     </div>
@@ -200,11 +159,11 @@
                     <!-- Quick Stats -->
                     <div class="grid grid-cols-3 gap-8 mt-12 max-w-2xl mx-auto">
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">1,000+</div>
+                            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{{ \App\Models\Listing::where('status', 'for_sale')->count() }}+</div>
                             <div class="text-sm text-slate-600 dark:text-slate-400">Active Listings</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">50+</div>
+                            <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{{ \App\Models\Listing::distinct('location')->count('location') }}+</div>
                             <div class="text-sm text-slate-600 dark:text-slate-400">Locations</div>
                         </div>
                         <div class="text-center">
@@ -333,15 +292,13 @@
                         Browse All Listings
                     </a>
                     @if (Route::has('register'))
-
-
                         <a
                             href="{{ route('register') }}"
-                            class="d-none px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-lg border-2 border-white/20"
+                            class="hidden px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-lg border-2 border-white/20"
                         >
                             Create Free Account
                         </a>
-                    @endif
+        @endif
                 </div>
             </div>
         </section>
@@ -366,10 +323,10 @@
                     <div>
                         <h4 class="text-white font-semibold mb-4">Browse</h4>
                         <ul class="space-y-2 text-sm">
-                            <li><a href="#" class="hover:text-emerald-400 transition-colors">All Listings</a></li>
-                            <li><a href="#" class="hover:text-emerald-400 transition-colors">Residential</a></li>
-                            <li><a href="#" class="hover:text-emerald-400 transition-colors">Agricultural</a></li>
-                            <li><a href="#" class="hover:text-emerald-400 transition-colors">Commercial</a></li>
+                            <li><a href="{{ route('listings.index') }}" class="hover:text-emerald-400 transition-colors">All Listings</a></li>
+                            <li><a href="{{ route('listings.index', ['category' => 'residential']) }}" class="hover:text-emerald-400 transition-colors">Residential</a></li>
+                            <li><a href="{{ route('listings.index', ['category' => 'agricultural']) }}" class="hover:text-emerald-400 transition-colors">Agricultural</a></li>
+                            <li><a href="{{ route('listings.index', ['category' => 'commercial']) }}" class="hover:text-emerald-400 transition-colors">Commercial</a></li>
                         </ul>
                     </div>
                     <div>

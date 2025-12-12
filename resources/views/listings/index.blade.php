@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Search and filter land listings by location, price, category, and more. Find your perfect property with LandHub.">
         <title>Search Listings - LandHub</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
@@ -65,6 +66,19 @@
                 </div>
             </nav>
         </header>
+
+        <!-- Breadcrumbs -->
+        <section class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 py-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex items-center gap-2 text-sm">
+                    <a href="{{ route('welcome') }}" class="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400">Home</a>
+                    <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span class="text-slate-900 dark:text-white font-medium">Search Listings</span>
+                </nav>
+            </div>
+        </section>
 
         <!-- Search & Filters Section -->
         <section class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 py-8">
@@ -175,6 +189,53 @@
         <!-- Results Section -->
         <section class="py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Active Filters -->
+                @if(request()->anyFilled(['search', 'location', 'min_price', 'max_price', 'category']))
+                    <div class="mb-6 flex flex-wrap items-center gap-2">
+                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Active filters:</span>
+                        @if(request('search'))
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                                Search: "{{ request('search') }}"
+                                <a href="{{ route('listings.index', request()->except('search')) }}" class="hover:text-emerald-600">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </a>
+                            </span>
+                        @endif
+                        @if(request('location'))
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                                Location: {{ request('location') }}
+                                <a href="{{ route('listings.index', request()->except('location')) }}" class="hover:text-emerald-600">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </a>
+                            </span>
+                        @endif
+                        @if(request('category'))
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                                Category: {{ ucfirst(request('category')) }}
+                                <a href="{{ route('listings.index', request()->except('category')) }}" class="hover:text-emerald-600">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </a>
+                            </span>
+                        @endif
+                        @if(request('min_price') || request('max_price'))
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                                Price: ₱{{ number_format(request('min_price', 0), 0) }} - {{ request('max_price') ? '₱' . number_format(request('max_price'), 0) : '∞' }}
+                                <a href="{{ route('listings.index', request()->except('min_price', 'max_price')) }}" class="hover:text-emerald-600">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </a>
+                            </span>
+                        @endif
+                    </div>
+                @endif
+
                 <!-- Results Header -->
                 <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -182,7 +243,7 @@
                             Search Results
                         </h2>
                         <p class="text-slate-600 dark:text-slate-400">
-                            Showing {{ $listings->total() }} listing{{ $listings->total() !== 1 ? 's' : '' }}
+                            Showing {{ $listings->count() }} of {{ $listings->total() }} listing{{ $listings->total() !== 1 ? 's' : '' }}
                         </p>
                     </div>
                     <form method="GET" action="{{ route('listings.index') }}" class="flex gap-3">
@@ -207,7 +268,7 @@
                             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                                 <div class="relative h-48 bg-slate-200 dark:bg-slate-700">
                                     @if($listing->image_url)
-                                        <img src="{{ $listing->image_url }}" alt="{{ $listing->title }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'">
+                                        <img src="{{ $listing->image_url }}" alt="{{ $listing->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-400">
                                             <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -257,12 +318,11 @@
                                             View Details
                                         </a>
                                         @if($listing->contact_fb_link)
-                                            <button onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                                            <button onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2" title="Contact via Messenger">
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M8 12.05a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM12 12.05a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12zm10-8a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
+                                                    <path d="M12 0C5.373 0 0 4.925 0 11c0 1.906.52 3.7 1.42 5.24L0 24l7.8-4.05C9.4 20.55 10.65 20.8 12 20.8c6.627 0 12-4.925 12-11S18.627 0 12 0zm0 18.8c-1.15 0-2.25-.2-3.3-.55l-.45-.15-4.65 2.4 1.05-4.5-.3-.45C3.7 14.3 3.2 12.7 3.2 11c0-4.4 3.9-8 8.8-8s8.8 3.6 8.8 8-3.9 8-8.8 8z"/>
                                                 </svg>
-                                                Messenger
+                                                <span class="hidden sm:inline">Messenger</span>
                                             </button>
                                         @endif
                                     </div>
@@ -272,9 +332,13 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="mt-8">
-                        {{ $listings->links() }}
-                    </div>
+                    @if($listings->hasPages())
+                        <div class="mt-8 flex justify-center">
+                            <div class="flex items-center gap-2">
+                                {{ $listings->links() }}
+                            </div>
+                        </div>
+                    @endif
                 @else
                     <div class="text-center py-16">
                         <svg class="w-24 h-24 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -340,3 +404,4 @@
 </html>
 
 
+clear
