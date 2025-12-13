@@ -12,7 +12,19 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite([
+            // 'resources/css/app.css',
+            'resources/js/app.js'
+        ])
+
+                <script src="{{ asset('tailwindcss.js') }}"></script>
+        <style type="text/tailwindcss">
+            @theme {
+                --color-clifford: #da373d;
+            }
+
+            </style>
+
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">

@@ -18,8 +18,6 @@
         <title>{{ $listing->title }} - LandHub</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
         <script src="{{ asset('tailwindcss.js') }}"></script>
         <style type="text/tailwindcss">
             @theme {
@@ -267,10 +265,24 @@
                                 </div>
                             @endif
 
+
+
+
+
                             @if($listing->latitude && $listing->longitude)
                                 <div class="mb-6">
                                     <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Location Map</h3>
-                                    <div id="map" class="mb-3"></div>
+                                    <div class="mb-3">
+                                        <iframe
+                                            width="100%"
+                                            height="400"
+                                            style="border:0; border-radius:.75rem;"
+                                            loading="lazy"
+                                            allowfullscreen
+                                            referrerpolicy="no-referrer-when-downgrade"
+                                            src="https://www.google.com/maps?q={{ $listing->latitude }},{{ $listing->longitude }}&z=15&output=embed">
+                                        </iframe>
+                                    </div>
                                     <div class="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
                                         <span>Coordinates: {{ $listing->latitude }}, {{ $listing->longitude }}</span>
                                         @if($listing->map_link)
@@ -285,6 +297,8 @@
                                 </div>
                             @endif
                         </div>
+
+
 
                         <!-- Contact Information -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
@@ -395,40 +409,7 @@
             const mediaItems = @json($allMedia);
             let currentMediaIndex = 0;
             let lightboxOpen = false;
-            @if($listing->latitude && $listing->longitude)
-            // Initialize map
-            document.addEventListener('DOMContentLoaded', function() {
-                const map = L.map('map').setView([{{ $listing->latitude }}, {{ $listing->longitude }}], 15);
 
-                // Add tile layer
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 19,
-                }).addTo(map);
-
-                // Custom icon for the marker
-                const customIcon = L.icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41]
-                });
-
-                // Add marker
-                const marker = L.marker([{{ $listing->latitude }}, {{ $listing->longitude }}], { icon: customIcon }).addTo(map);
-
-                // Add popup with listing info
-                marker.bindPopup(`
-                    <div class="p-2">
-                        <h4 class="font-bold text-slate-900 mb-1">{{ $listing->title }}</h4>
-                        <p class="text-sm text-slate-600">{{ $listing->location }}</p>
-                        <p class="text-sm font-semibold text-emerald-600 mt-1">₱{{ number_format($listing->price, 0) }}</p>
-                    </div>
-                `).openPopup();
-            });
-            @endif
 
             function openMessenger(fbLink) {
                 const userId = fbLink.split('/').pop();
