@@ -22,6 +22,13 @@ class ListingSeeder extends Seeder
                 'category' => 'residential',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 11.9674,
                 'longitude' => 121.9248,
                 'nearby_landmarks' => 'White Beach, D\'Mall, Station 2',
@@ -38,6 +45,12 @@ class ListingSeeder extends Seeder
                 'category' => 'agricultural',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 14.2685,
                 'longitude' => 121.4663,
                 'nearby_landmarks' => 'Calamba City, Pagsanjan Falls',
@@ -54,6 +67,13 @@ class ListingSeeder extends Seeder
                 'category' => 'commercial',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4'],
+                ],
                 'latitude' => 14.5547,
                 'longitude' => 121.0244,
                 'nearby_landmarks' => 'Ayala Avenue, Greenbelt Mall',
@@ -70,6 +90,12 @@ class ListingSeeder extends Seeder
                 'category' => 'residential',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 16.4023,
                 'longitude' => 120.5960,
                 'nearby_landmarks' => 'Burnham Park, Session Road',
@@ -86,6 +112,14 @@ class ListingSeeder extends Seeder
                 'category' => 'agricultural',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 15.5784,
                 'longitude' => 120.9886,
                 'nearby_landmarks' => 'Cabanatuan City, Palayan City',
@@ -102,6 +136,12 @@ class ListingSeeder extends Seeder
                 'category' => 'residential',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 10.3157,
                 'longitude' => 123.8854,
                 'nearby_landmarks' => 'Ayala Center, SM City Cebu',
@@ -118,6 +158,14 @@ class ListingSeeder extends Seeder
                 'category' => 'commercial',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/2491284/2491284-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 9.8349,
                 'longitude' => 118.7384,
                 'nearby_landmarks' => 'Puerto Princesa, El Nido',
@@ -134,6 +182,12 @@ class ListingSeeder extends Seeder
                 'category' => 'agricultural',
                 'status' => 'for_sale',
                 'image_url' => 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop',
+                'media' => [
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop'],
+                    ['type' => 'video', 'url' => 'https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_30fps.mp4'],
+                    ['type' => 'image', 'url' => 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop'],
+                ],
                 'latitude' => 7.1907,
                 'longitude' => 125.4553,
                 'nearby_landmarks' => 'Davao City, Mount Apo',
@@ -143,8 +197,10 @@ class ListingSeeder extends Seeder
             ],
         ];
 
-        foreach ($listings as $listing) {
-            Listing::create($listing);
+        foreach ($listings as $listingData) {
+            $listing = new Listing();
+            $listing->fill($listingData);
+            $listing->save();
         }
     }
 }
