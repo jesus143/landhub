@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ListingController extends Controller
 {
@@ -65,9 +66,16 @@ class ListingController extends Controller
 
     /**
      * Display the specified listing.
+     *.http://localhost:8000/lands/1-residential-beachfront-property-in-boracay-boracay-aklan
      */
-    public function show(Listing $listing)
+    public function show(Listing $listing, $slug)
     {
+        $expected = Str::slug($listing->category) . '-'.  Str::slug($listing->title) . '-' . Str::slug($listing->location);
+
+        if ($slug !== $expected) {
+            return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $expected], 301);
+        }
+
         return view('listings.show', [
             'listing' => $listing,
         ]);

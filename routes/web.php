@@ -9,7 +9,8 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
-Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
+// SEO-friendly show route: /lands/{id}-{slug}
+Route::get('/lands/{listing}-{slug}', [ListingController::class, 'show'])->name('listings.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

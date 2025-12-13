@@ -281,7 +281,7 @@
                                 <div class="relative h-48 bg-slate-200 dark:bg-slate-700">
                                     @if($listing->image_url)
 
-                                        <a href="{{ route('listings.show', $listing) }}" class="cursor-pointer"  >
+                                        <a href="{{ route('listings.show', ['listing' => $listing->id, 'slug' => \Illuminate\Support\Str::slug($listing->title)]) }}" class="cursor-pointer"  >
                                             <img src="{{ $listing->image_url }}" alt="{{ $listing->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'">
                                         </a>
                                     @else
@@ -329,7 +329,7 @@
                                         </div>
                                     </div>
                                     <div class="flex gap-3">
-                                        <a href="{{ route('listings.show', $listing) }}" class="flex-1 text-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
+                                        <a href="{{ route('listings.show', ['listing' => $listing->id, 'slug' => \Illuminate\Support\Str::slug($listing->title)]) }}" class="flex-1 text-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
                                             View Details
                                         </a>
                                         @if($listing->contact_fb_link)
