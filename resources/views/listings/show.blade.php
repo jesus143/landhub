@@ -91,6 +91,8 @@
             </div>
         </section>
 
+
+
         <!-- Listing Details -->
         <section class="py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,12 +108,15 @@
                                             <div id="media-main-{{ $index }}" class="media-main-item {{ $index === 0 ? '' : 'hidden' }}">
                                                 @if($item['type'] === 'video')
                                                     <video
+
                                                         src="{{ $item['url'] }}"
-                                                        class="w-full h-full object-cover"
+                                                        class="w-full h-full object-cover hidden"
                                                         controls
                                                         preload="metadata"
                                                         onclick="openLightbox({{ $index }})"
                                                     ></video>
+                                                     <iframe width="100%" height="315" src="https://www.youtube.com/embed/MLATROF5KMk?si=8tzWrBQqcSO5kU04" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
                                                 @else
                                                     <img
                                                         src="{{ $item['url'] }}"
@@ -191,7 +196,15 @@
                                         @endforeach
                                     </div>
                                 @endif
+
+                            <h3> Featured Video </h3>
+                            <div class=" w-full border-2">
+                                <iframe width="100%" height="315" src="https://www.youtube.com/embed/MLATROF5KMk?si=8tzWrBQqcSO5kU04" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                             </div>
+
+
+                            </div>
+
                         @else
                             <div class="w-full h-96 bg-slate-200 dark:bg-slate-700 rounded-xl flex items-center justify-center">
                                 <svg class="w-24 h-24 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,6 +213,10 @@
                             </div>
                         @endif
                     </div>
+
+
+
+
 
                     <!-- Details -->
                     <div class="space-y-6">
@@ -330,9 +347,11 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
+
 
         <!-- Lightbox Modal -->
         <div id="lightbox" class="fixed inset-0 bg-black/90 dark:bg-black/95 z-50 hidden items-center justify-center p-4">
