@@ -27,7 +27,7 @@
                         </div>
                         <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
                     </a>
-                    <div class="hidden md:flex items-center gap-4">
+                    <div class="hidden md:flex items-center gap-4" style="display:none">
                         @auth
                             <a href="{{ url('/dashboard') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                                 Dashboard
@@ -53,7 +53,7 @@
                     </button>
                 </div>
                 <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-slate-200 dark:border-slate-700 mt-2 pt-4">
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3 " style="display:none">
                         @auth
                             <a href="{{ url('/dashboard') }}" class="px-4 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Dashboard</a>
                         @else
@@ -106,19 +106,31 @@
 
                     <!-- Filters Row -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <!-- Location Filter -->
+                        <!-- Location Filter (search + dropdown) -->
                         <div>
                             <label for="location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Location
                             </label>
-                            <input
-                                type="text"
-                                id="location"
-                                name="location"
-                                value="{{ request('location') }}"
-                                placeholder="Enter location..."
-                                class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            />
+                            @php
+                                $locationOptions = $locations ?? ($listings->pluck('location')->unique()->filter()->values() ?? collect());
+                            @endphp
+                            <div class="flex flex-col gap-2">
+                                <input
+                                    type="text"
+                                    id="location"
+                                    name="location"
+                                    value="{{ request('location') }}"
+                                    placeholder="Type or choose a location..."
+                                    list="location-list"
+                                    class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                />
+
+                                <datalist id="location-list">
+                                    @foreach($locationOptions as $loc)
+                                        <option value="{{ $loc }}"></option>
+                                    @endforeach
+                                </datalist>
+                            </div>
                         </div>
 
                         <!-- Min Price -->
