@@ -4,9 +4,15 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="{{ \Illuminate\Support\Str::limit($listing->description ?? $listing->title . ' - ' . $listing->location, 160) }}">
+        @php
+            $allMedia = $listing->getAllMedia();
+            $firstMedia = collect($allMedia)->first();
+        @endphp
         <meta property="og:title" content="{{ $listing->title }}">
         <meta property="og:description" content="{{ \Illuminate\Support\Str::limit($listing->description ?? $listing->title . ' - ' . $listing->location, 160) }}">
-        @if($listing->image_url)
+        @if($firstMedia && $firstMedia['type'] === 'image')
+            <meta property="og:image" content="{{ $firstMedia['url'] }}">
+        @elseif($listing->image_url)
             <meta property="og:image" content="{{ $listing->image_url }}">
         @endif
         <title>{{ $listing->title }} - LandHub</title>
@@ -25,6 +31,15 @@
                 width: 100%;
                 border-radius: 0.75rem;
                 z-index: 1;
+            }
+
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
             }
         </style>
     </head>
@@ -80,10 +95,103 @@
         <section class="py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Image -->
+                    <!-- Media Gallery -->
                     <div>
-                        @if($listing->image_url)
-                            <img src="{{ $listing->image_url }}" alt="{{ $listing->title }}" class="w-full h-96 object-cover rounded-xl shadow-lg" onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'">
+                        @if(count($allMedia) > 0)
+                            <div class="space-y-4">
+                                <!-- Main Media Display -->
+                                <div class="relative group">
+                                    <div class="w-full h-96 bg-slate-200 dark:bg-slate-700 rounded-xl overflow-hidden shadow-lg">
+                                        @foreach($allMedia as $index => $item)
+                                            <div id="media-main-{{ $index }}" class="media-main-item {{ $index === 0 ? '' : 'hidden' }}">
+                                                @if($item['type'] === 'video')
+                                                    <video
+                                                        src="{{ $item['url'] }}"
+                                                        class="w-full h-full object-cover"
+                                                        controls
+                                                        preload="metadata"
+                                                        onclick="openLightbox({{ $index }})"
+                                                    ></video>
+                                                @else
+                                                    <img
+                                                        src="{{ $item['url'] }}"
+                                                        alt="{{ $listing->title }} - Media {{ $index + 1 }}"
+                                                        class="w-full h-full object-cover cursor-pointer transition-transform hover:scale-105"
+                                                        onclick="openLightbox({{ $index }})"
+                                                        onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'"
+                                                    >
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <!-- Navigation Arrows -->
+                                    @if(count($allMedia) > 1)
+                                        <button
+                                            onclick="changeMedia(-1)"
+                                            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 text-slate-900 dark:text-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                                            aria-label="Previous media"
+                                        >
+                                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onclick="changeMedia(1)"
+                                            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 text-slate-900 dark:text-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                                            aria-label="Next media"
+                                        >
+                                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    @endif
+
+                                    <!-- Media Type Badge -->
+                                    <div class="absolute top-4 left-4">
+                                        <span id="media-type-badge" class="px-3 py-1 bg-black/50 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
+                                            {{ $allMedia[0]['type'] === 'video' ? 'Video' : 'Image' }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Thumbnail Strip -->
+                                @if(count($allMedia) > 1)
+                                    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                        @foreach($allMedia as $index => $item)
+                                            <button
+                                                onclick="selectMedia({{ $index }})"
+                                                id="thumbnail-{{ $index }}"
+                                                class="thumbnail-item flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 {{ $index === 0 ? 'border-emerald-600 dark:border-emerald-400' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600' }} transition-all"
+                                                aria-label="View media {{ $index + 1 }}"
+                                            >
+                                                @if($item['type'] === 'video')
+                                                    <div class="relative w-full h-full bg-slate-300 dark:bg-slate-600">
+                                                        <video
+                                                            src="{{ $item['url'] }}"
+                                                            class="w-full h-full object-cover"
+                                                            preload="metadata"
+                                                            muted
+                                                        ></video>
+                                                        <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M8 5v14l11-7z"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <img
+                                                        src="{{ $item['url'] }}"
+                                                        alt="Thumbnail {{ $index + 1 }}"
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.src='https://via.placeholder.com/80x80?text=Image'"
+                                                    >
+                                                @endif
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
                         @else
                             <div class="w-full h-96 bg-slate-200 dark:bg-slate-700 rounded-xl flex items-center justify-center">
                                 <svg class="w-24 h-24 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -226,7 +334,48 @@
             </div>
         </section>
 
+        <!-- Lightbox Modal -->
+        <div id="lightbox" class="fixed inset-0 bg-black/90 dark:bg-black/95 z-50 hidden items-center justify-center p-4">
+            <button
+                onclick="closeLightbox()"
+                class="absolute top-4 right-4 text-white hover:text-slate-300 transition-colors z-10"
+                aria-label="Close lightbox"
+            >
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            @if(count($allMedia) > 1)
+                <button
+                    onclick="changeLightboxMedia(-1)"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all"
+                    aria-label="Previous media"
+                >
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button
+                    onclick="changeLightboxMedia(1)"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all"
+                    aria-label="Next media"
+                >
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            @endif
+
+            <div class="max-w-7xl w-full h-full flex items-center justify-center">
+                <div id="lightbox-content" class="max-w-full max-h-full"></div>
+            </div>
+        </div>
+
         <script>
+            const mediaItems = @json($allMedia);
+            let currentMediaIndex = 0;
+            let lightboxOpen = false;
             @if($listing->latitude && $listing->longitude)
             // Initialize map
             document.addEventListener('DOMContentLoaded', function() {
@@ -296,6 +445,138 @@
                     alert('Failed to copy link');
                 });
             }
+
+            // Media Gallery Functions
+            function selectMedia(index) {
+                currentMediaIndex = index;
+                updateMainMedia();
+                updateThumbnails();
+            }
+
+            function changeMedia(direction) {
+                currentMediaIndex += direction;
+                if (currentMediaIndex < 0) {
+                    currentMediaIndex = mediaItems.length - 1;
+                } else if (currentMediaIndex >= mediaItems.length) {
+                    currentMediaIndex = 0;
+                }
+                updateMainMedia();
+                updateThumbnails();
+            }
+
+            function updateMainMedia() {
+                // Hide all main media items
+                document.querySelectorAll('.media-main-item').forEach(item => {
+                    item.classList.add('hidden');
+                });
+
+                // Show current media item
+                const currentItem = document.getElementById(`media-main-${currentMediaIndex}`);
+                if (currentItem) {
+                    currentItem.classList.remove('hidden');
+                }
+
+                // Update media type badge
+                const badge = document.getElementById('media-type-badge');
+                if (badge && mediaItems[currentMediaIndex]) {
+                    badge.textContent = mediaItems[currentMediaIndex].type === 'video' ? 'Video' : 'Image';
+                }
+            }
+
+            function updateThumbnails() {
+                document.querySelectorAll('.thumbnail-item').forEach((thumb, index) => {
+                    if (index === currentMediaIndex) {
+                        thumb.classList.remove('border-transparent', 'hover:border-slate-300', 'dark:hover:border-slate-600');
+                        thumb.classList.add('border-emerald-600', 'dark:border-emerald-400');
+                    } else {
+                        thumb.classList.remove('border-emerald-600', 'dark:border-emerald-400');
+                        thumb.classList.add('border-transparent', 'hover:border-slate-300', 'dark:hover:border-slate-600');
+                    }
+                });
+            }
+
+            function openLightbox(index) {
+                currentMediaIndex = index;
+                lightboxOpen = true;
+                const lightbox = document.getElementById('lightbox');
+                const lightboxContent = document.getElementById('lightbox-content');
+
+                if (lightbox && lightboxContent && mediaItems[index]) {
+                    const item = mediaItems[index];
+                    if (item.type === 'video') {
+                        lightboxContent.innerHTML = `
+                            <video
+                                src="${item.url}"
+                                class="max-w-full max-h-[90vh] rounded-lg"
+                                controls
+                                autoplay
+                            ></video>
+                        `;
+                    } else {
+                        lightboxContent.innerHTML = `
+                            <img
+                                src="${item.url}"
+                                alt="{{ $listing->title }} - Media ${index + 1}"
+                                class="max-w-full max-h-[90vh] object-contain rounded-lg"
+                            >
+                        `;
+                    }
+                    lightbox.classList.remove('hidden');
+                    lightbox.classList.add('flex');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeLightbox() {
+                const lightbox = document.getElementById('lightbox');
+                if (lightbox) {
+                    lightbox.classList.add('hidden');
+                    lightbox.classList.remove('flex');
+                    document.body.style.overflow = '';
+                    // Stop any playing videos
+                    const video = lightbox.querySelector('video');
+                    if (video) {
+                        video.pause();
+                    }
+                }
+                lightboxOpen = false;
+            }
+
+            function changeLightboxMedia(direction) {
+                currentMediaIndex += direction;
+                if (currentMediaIndex < 0) {
+                    currentMediaIndex = mediaItems.length - 1;
+                } else if (currentMediaIndex >= mediaItems.length) {
+                    currentMediaIndex = 0;
+                }
+                openLightbox(currentMediaIndex);
+            }
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (lightboxOpen) {
+                    if (e.key === 'Escape') {
+                        closeLightbox();
+                    } else if (e.key === 'ArrowLeft') {
+                        changeLightboxMedia(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        changeLightboxMedia(1);
+                    }
+                } else if (mediaItems.length > 1) {
+                    if (e.key === 'ArrowLeft') {
+                        changeMedia(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        changeMedia(1);
+                    }
+                }
+            });
+
+            // Close lightbox on background click
+            document.getElementById('lightbox')?.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLightbox();
+                }
+            });
         </script>
     </body>
 </html>

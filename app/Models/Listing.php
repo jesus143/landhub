@@ -15,6 +15,7 @@ class Listing extends Model
         'category',
         'status',
         'image_url',
+        'media',
         'latitude',
         'longitude',
         'nearby_landmarks',
@@ -31,6 +32,25 @@ class Listing extends Model
             'area' => 'decimal:2',
             'latitude' => 'decimal:8',
             'longitude' => 'decimal:8',
+            'media' => 'array',
         ];
+    }
+
+    /**
+     * Get all media items including backward compatibility with image_url.
+     */
+    public function getAllMedia(): array
+    {
+        $media = $this->media ?? [];
+
+        // Backward compatibility: if image_url exists and not in media, add it
+        if ($this->image_url && ! collect($media)->contains('url', $this->image_url)) {
+            array_unshift($media, [
+                'type' => 'image',
+                'url' => $this->image_url,
+            ]);
+        }
+
+        return $media;
     }
 }
