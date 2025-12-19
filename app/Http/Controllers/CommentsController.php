@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCommentRequest;
 use App\Models\Listing;
 use App\Models\Comment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
 class CommentsController extends Controller
 {
-    public function store(StoreCommentRequest $request, Listing $listing, $slug): RedirectResponse
+    /**
+     * Store a new comment. Allows guests and authenticated users.
+     */
+    public function store(StoreCommentRequest $request, Listing $listing, $slug): JsonResponse|RedirectResponse
     {
         $data = $request->validated();
 
@@ -28,7 +32,28 @@ class CommentsController extends Controller
 
         $comment->save();
 
-        return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $slug])
-            ->with('success', 'Comment posted successfully.');
+        $comment->load('user');
+
+        if ($request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Comment posted successfully.',
+                'comment' => $comment,
+            ]);
+        }
+
+        return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $slug])->with('success', 'Comment posted successfully.');
+    }
+
+    // Keep update/delete behavior to authenticated and authorized users only.
+    public function update($request, Comment $comment)
+    {
+        // left as-is or implement later
+        abort(404);
+    }
+
+    public function destroy($request, Comment $comment)
+    {
+        abort(404);
     }
 }

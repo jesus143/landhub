@@ -23,6 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Comments endpoints handled via listings routes (guests + auth)
+
     // Admin listing management
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('listings', [\App\Http\Controllers\AdminListingController::class, 'index'])->name('listings.index');

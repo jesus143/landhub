@@ -16,6 +16,7 @@
             <meta property="og:image" content="{{ $listing->image_url }}">
         @endif
         <title>{{ $listing->title }} - LandHub</title>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
         <script src="{{ asset('tailwindcss.js') }}"></script>
@@ -368,67 +369,149 @@
 
 
         <!-- Comments Section -->
-        <section class="py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Comments</h3>
+        <section class="py-12 bg-slate-50 dark:bg-slate-900">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Comments & Questions</h2>
 
-                    @if(session('success'))
-                        <div class="mb-4 p-3 rounded bg-emerald-50 text-emerald-700">{{ session('success') }}</div>
-                    @endif
-
-                    <div class="space-y-4 mb-6">
-                        @forelse($listing->comments as $comment)
-                            <div class="flex gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-700 dark:text-slate-300">{{ strtoupper(substr($comment->guest_name ?? optional($comment->user)->name ?? 'G', 0, 1)) }}</div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="text-sm font-semibold text-slate-900 dark:text-white">{{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}</div>
-                                        <div class="text-xs text-slate-500 dark:text-slate-400">{{ $comment->created_at->diffForHumans() }}</div>
-                                    </div>
-                                    <div class="text-slate-700 dark:text-slate-300 mt-1">{{ $comment->body }}</div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-slate-600 dark:text-slate-400">No comments yet. Be the first to comment.</div>
-                        @endforelse
-                    </div>
-
+                    <!-- Comment Form (guests and authenticated users) -->
                     @php
                         $commentSlug = \Illuminate\Support\Str::slug($listing->category) . '-' . \Illuminate\Support\Str::slug($listing->title) . '-' . \Illuminate\Support\Str::slug($listing->location);
                     @endphp
-
-                    <form action="{{ route('listings.comments.store', ['listing' => $listing->id, 'slug' => $commentSlug]) }}" method="POST">
+                    <form id="comment-form" method="POST" action="{{ route('listings.comments.store', ['listing' => $listing->id, 'slug' => $commentSlug]) }}" class="mb-8">
                         @csrf
-                        @guest
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
-                                    <input name="guest_name" value="{{ old('guest_name') }}" class="mt-1 block w-full rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2">
-                                    @error('guest_name') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
+                        <div class="space-y-4">
+                            @guest
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label for="guest_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Name</label>
+                                        <input id="guest_name" name="guest_name" value="{{ old('guest_name') }}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" required>
+                                    </div>
+                                    <div>
+                                        <label for="guest_email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email (optional)</label>
+                                        <input id="guest_email" name="guest_email" value="{{ old('guest_email') }}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                                    </div>
                                 </div>
+                            @endguest
+
+                            <div>
+                                <label for="body" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Comment</label>
+                                <textarea id="body" name="body" rows="4" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none" placeholder="Share your thoughts or ask about this property..." required>{{ old('body') }}</textarea>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-slate-500">You may comment as a guest or <a href="{{ route('login') }}" class="text-emerald-600">sign in</a> for a richer experience.</div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email (optional)</label>
-                                    <input name="guest_email" value="{{ old('guest_email') }}" class="mt-1 block w-full rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2">
-                                    @error('guest_email') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
+                                    <button type="submit" id="submit-comment" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <span id="submit-text">Post Comment</span>
+                                        <span id="loading-text" class="hidden">Posting...</span>
+                                    </button>
                                 </div>
                             </div>
-                        @endguest
-
-                        <div class="mb-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Comment</label>
-                            <textarea name="body" rows="4" class="mt-1 block w-full rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2">{{ old('body') }}</textarea>
-                            @error('body') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                         </div>
+                    </form>
 
-                        <div class="flex items-center gap-3">
-                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Post Comment</button>
-                            <div class="text-sm text-slate-500">You may comment as a guest or sign in first.</div>
+                    <!-- Comments Display -->
+                    <div id="comments-section">
+                        @if($listing->comments->count() > 0)
+                            <div class="space-y-6">
+                                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                                    {{ $listing->comments->count() }} Comment{{ $listing->comments->count() !== 1 ? 's' : '' }}
+                                </h3>
+
+                                @foreach($listing->comments as $comment)
+                                    <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50" data-comment-id="{{ $comment->id }}">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex items-start space-x-3">
+                                                <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
+                                                    <span class="text-white font-medium text-sm">
+                                                        {{ strtoupper(substr(optional($comment->user)->name ?? $comment->guest_name ?? 'G', 0, 1)) }}
+                                                    </span>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <div class="flex items-center space-x-2 mb-1">
+                                                        <span class="font-medium text-slate-900 dark:text-white">
+                                                            {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
+                                                        </span>
+                                                        <span class="text-sm text-slate-500 dark:text-slate-400">
+                                                            {{ $comment->created_at->diffForHumans() }}
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">
+                                                        {{ $comment->body }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            @if(auth()->check() && auth()->id() === $comment->user_id)
+                                                <div class="flex space-x-2 ml-4">
+                                                    <button
+                                                        onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->content) }}')"
+                                                        class="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onclick="deleteComment({{ $comment->id }})"
+                                                        class="text-sm text-red-600 hover:text-red-700 font-medium"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-8">
+                                <svg class="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9 8s9 3.582 9 8z" />
+                                </svg>
+                                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No comments yet</h3>
+                                <p class="text-slate-600 dark:text-slate-400">Be the first to ask a question or leave a comment!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edit Comment Modal -->
+        <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white dark:bg-slate-800 rounded-lg max-w-lg w-full p-6">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Edit Comment</h3>
+                    <form id="edit-form">
+                        @csrf
+                        @method('PUT')
+                        <textarea
+                            id="edit-content"
+                            name="content"
+                            rows="4"
+                            class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                            required
+                        ></textarea>
+                        <div class="flex justify-end space-x-3 mt-4">
+                            <button
+                                type="button"
+                                onclick="closeEditModal()"
+                                class="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                id="update-comment"
+                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg disabled:opacity-50"
+                            >
+                                Update
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- Lightbox Modal -->
         <div id="lightbox" class="fixed inset-0 bg-black/90 dark:bg-black/95 z-50 hidden items-center justify-center p-4">
@@ -640,6 +723,211 @@
                     closeLightbox();
                 }
             });
+
+            // Comment functionality
+            document.getElementById('comment-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const form = this;
+                const submitBtn = document.getElementById('submit-comment');
+                const submitText = document.getElementById('submit-text');
+                const loadingText = document.getElementById('loading-text');
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitText.classList.add('hidden');
+                loadingText.classList.remove('hidden');
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Clear form
+                        form.reset();
+                        // Reload comments section
+                        location.reload();
+                    } else {
+                        alert('Error posting comment. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error posting comment. Please try again.');
+                })
+                .finally(() => {
+                    // Reset loading state
+                    submitBtn.disabled = false;
+                    submitText.classList.remove('hidden');
+                    loadingText.classList.add('hidden');
+                });
+            });
+
+            // Edit comment functions
+            function editComment(commentId, content) {
+                document.getElementById('edit-content').value = content;
+                document.getElementById('edit-form').action = `/comments/${commentId}`;
+                document.getElementById('edit-modal').classList.remove('hidden');
+                document.getElementById('edit-modal').classList.add('flex');
+            }
+
+            function closeEditModal() {
+                document.getElementById('edit-modal').classList.add('hidden');
+                document.getElementById('edit-modal').classList.remove('flex');
+            }
+
+            // Update comment via AJAX
+            document.getElementById('edit-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const form = this;
+                const updateBtn = document.getElementById('update-comment');
+
+                updateBtn.disabled = true;
+                updateBtn.textContent = 'Updating...';
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error updating comment. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating comment. Please try again.');
+                })
+                .finally(() => {
+                    updateBtn.disabled = false;
+                    updateBtn.textContent = 'Update';
+                    closeEditModal();
+                });
+            });
+
+            // Delete comment
+            function deleteComment(commentId) {
+                if (!confirm('Are you sure you want to delete this comment?')) {
+                    return;
+                }
+
+                fetch(`/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting comment. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting comment. Please try again.');
+                });
+            }
+
+            // AJAX submit new comment
+            const commentForm = document.getElementById('comment-form');
+            if (commentForm) {
+                commentForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const submitBtn = document.getElementById('submit-comment');
+                    const submitText = document.getElementById('submit-text');
+                    const loadingText = document.getElementById('loading-text');
+
+                    submitBtn.disabled = true;
+                    submitText.classList.add('hidden');
+                    loadingText.classList.remove('hidden');
+
+                    const url = this.action;
+                    const formData = new FormData(this);
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // prepend new comment to comments-section
+                            const commentsSection = document.getElementById('comments-section');
+                            const container = document.createElement('div');
+                            container.className = 'border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50 mb-4';
+                            const author = data.comment.user ? (data.comment.user.name) : (data.comment.guest_name || 'Guest');
+                            const time = 'just now';
+                            const body = data.comment.body;
+                            container.innerHTML = `
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-medium text-sm">${(author || 'G').charAt(0).toUpperCase()}</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-2 mb-1">
+                                                <span class="font-medium text-slate-900 dark:text-white">${author}</span>
+                                                <span class="text-sm text-slate-500 dark:text-slate-400">${time}</span>
+                                            </div>
+                                            <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">${body}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            // if there is a 'No comments yet' block, remove it
+                            const noComments = commentsSection.querySelector('.text-center.py-8');
+                            if (noComments) noComments.remove();
+
+                            // Prepend
+                            commentsSection.prepend(container);
+
+                            // clear textarea
+                            document.getElementById('body').value = '';
+                        } else {
+                            alert(data.message || 'Failed to post comment');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Error posting comment.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitText.classList.remove('hidden');
+                        loadingText.classList.add('hidden');
+                    });
+                });
+            }
         </script>
     </body>
 </html>
