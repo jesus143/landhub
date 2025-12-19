@@ -76,6 +76,11 @@ class ListingController extends Controller
             return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $expected], 301);
         }
 
+        // eager load comments and commenter user
+        $listing->load(['comments' => function ($q) {
+            $q->latest();
+        }, 'comments.user']);
+
         return view('listings.show', [
             'listing' => $listing,
         ]);

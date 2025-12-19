@@ -11,6 +11,8 @@ Route::get('/', function () {
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
 // SEO-friendly show route: /lands/{id}-{slug}
 Route::get('/lands/{listing}-{slug}', [ListingController::class, 'show'])->name('listings.show');
+// Store comments (guests and authenticated users)
+Route::post('/lands/{listing}-{slug}/comments', [\App\Http\Controllers\CommentsController::class, 'store'])->name('listings.comments.store');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

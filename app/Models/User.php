@@ -47,4 +47,12 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
         ];
     }
+
+    /**
+     * Comments made by the user.
+     */
+    public function comments()
+    {
+        return $this->hasMany(\App\Models\Comment::class);
+    }
 }

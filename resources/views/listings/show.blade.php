@@ -367,6 +367,69 @@
         </section>
 
 
+        <!-- Comments Section -->
+        <section class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Comments</h3>
+
+                    @if(session('success'))
+                        <div class="mb-4 p-3 rounded bg-emerald-50 text-emerald-700">{{ session('success') }}</div>
+                    @endif
+
+                    <div class="space-y-4 mb-6">
+                        @forelse($listing->comments as $comment)
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-700 dark:text-slate-300">{{ strtoupper(substr($comment->guest_name ?? optional($comment->user)->name ?? 'G', 0, 1)) }}</div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-semibold text-slate-900 dark:text-white">{{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">{{ $comment->created_at->diffForHumans() }}</div>
+                                    </div>
+                                    <div class="text-slate-700 dark:text-slate-300 mt-1">{{ $comment->body }}</div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-slate-600 dark:text-slate-400">No comments yet. Be the first to comment.</div>
+                        @endforelse
+                    </div>
+
+                    @php
+                        $commentSlug = \Illuminate\Support\Str::slug($listing->category) . '-' . \Illuminate\Support\Str::slug($listing->title) . '-' . \Illuminate\Support\Str::slug($listing->location);
+                    @endphp
+
+                    <form action="{{ route('listings.comments.store', ['listing' => $listing->id, 'slug' => $commentSlug]) }}" method="POST">
+                        @csrf
+                        @guest
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
+                                    <input name="guest_name" value="{{ old('guest_name') }}" class="mt-1 block w-full rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2">
+                                    @error('guest_name') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email (optional)</label>
+                                    <input name="guest_email" value="{{ old('guest_email') }}" class="mt-1 block w-full rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2">
+                                    @error('guest_email') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        @endguest
+
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Comment</label>
+                            <textarea name="body" rows="4" class="mt-1 block w-full rounded-md border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-2">{{ old('body') }}</textarea>
+                            @error('body') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Post Comment</button>
+                            <div class="text-sm text-slate-500">You may comment as a guest or sign in first.</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
         <!-- Lightbox Modal -->
         <div id="lightbox" class="fixed inset-0 bg-black/90 dark:bg-black/95 z-50 hidden items-center justify-center p-4">
             <button

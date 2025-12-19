@@ -53,4 +53,12 @@ class Listing extends Model
 
         return $media;
     }
+
+    /**
+     * Comments for this listing.
+     */
+    public function comments()
+    {
+        return $this->hasMany(\App\Models\Comment::class);
+    }
 }
