@@ -27,7 +27,7 @@
                         </div>
                         <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
                     </a>
-                    <div class="hidden md:flex items-center gap-4" style="display:none">
+                    <div class="hidden md:flex items-center gap-4" >
                         @auth
                             <a href="{{ url('/dashboard') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                                 Dashboard
@@ -53,7 +53,7 @@
                     </button>
                 </div>
                 <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-slate-200 dark:border-slate-700 mt-2 pt-4">
-                    <div class="flex flex-col gap-3 " style="display:none">
+                    <div class="flex flex-col gap-3 "  >
                         @auth
                             <a href="{{ url('/dashboard') }}" class="px-4 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors">Dashboard</a>
                         @else
