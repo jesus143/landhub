@@ -126,26 +126,58 @@
 
                                 <!-- Compact Filters -->
                                 <div class="space-y-3">
-                                    <!-- Location -->
-                                    <div>
-                                        <label for="location" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Location</label>
-                                        @php
-                                            $locationOptions = $locations ?? ($listings->pluck('location')->unique()->filter()->values() ?? collect());
-                                        @endphp
-                                        <input
-                                            type="text"
-                                            id="location"
-                                            name="location"
-                                            value="{{ request('location') }}"
-                                            placeholder="Any location"
-                                            list="location-list"
-                                            class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                        />
-                                        <datalist id="location-list">
-                                            @foreach($locationOptions as $loc)
-                                                <option value="{{ $loc }}"></option>
-                                            @endforeach
-                                        </datalist>
+                                    <!-- Location Searchable Dropdown -->
+                                    <div class="relative">
+                                        <label for="location-input" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Location</label>
+                                        <div class="relative">
+                                            <input
+                                                type="text"
+                                                id="location-input"
+                                                name="location"
+                                                value="{{ request('location') }}"
+                                                placeholder="Type or select location..."
+                                                autocomplete="off"
+                                                class="w-full px-3 py-2 pr-8 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            />
+                                            <button
+                                                type="button"
+                                                id="location-dropdown-toggle"
+                                                class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none"
+                                                aria-label="Toggle location dropdown"
+                                            >
+                                                <svg class="w-4 h-4 transition-transform" id="location-arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Dropdown Menu -->
+                                        <div id="location-dropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-hidden">
+                                            <!-- Options List -->
+                                            <div id="location-options" class="max-h-60 overflow-y-auto">
+                                                <button
+                                                    type="button"
+                                                    class="location-option w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-400 cursor-pointer {{ request('location') === '' || !request('location') ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' : '' }}"
+                                                    data-value=""
+                                                >
+                                                    All Locations
+                                                </button>
+                                                @foreach($locations as $location)
+                                                    <button
+                                                        type="button"
+                                                        class="location-option w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 dark:hover:text-emerald-400 cursor-pointer {{ request('location') === $location ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' : '' }}"
+                                                        data-value="{{ $location }}"
+                                                    >
+                                                        {{ $location }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
+
+                                            <!-- No Results -->
+                                            <div id="location-no-results" class="hidden px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
+                                                No locations found
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Price Range -->
@@ -454,6 +486,137 @@
                         }
                     });
                 }
+
+                // Location Searchable Dropdown
+                const locationInput = document.getElementById('location-input');
+                const locationDropdown = document.getElementById('location-dropdown');
+                const locationDropdownToggle = document.getElementById('location-dropdown-toggle');
+                const locationOptions = document.querySelectorAll('.location-option');
+                const locationArrowIcon = document.getElementById('location-arrow-icon');
+                const locationNoResults = document.getElementById('location-no-results');
+                const locationOptionsContainer = document.getElementById('location-options');
+
+                let isDropdownOpen = false;
+
+                function toggleDropdown() {
+                    isDropdownOpen = !isDropdownOpen;
+                    if (isDropdownOpen) {
+                        locationDropdown.classList.remove('hidden');
+                        locationArrowIcon.style.transform = 'rotate(180deg)';
+                        filterOptions(locationInput.value);
+                    } else {
+                        locationDropdown.classList.add('hidden');
+                        locationArrowIcon.style.transform = 'rotate(0deg)';
+                    }
+                }
+
+                function filterOptions(searchTerm) {
+                    const term = searchTerm.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    locationOptions.forEach(option => {
+                        const text = option.textContent.toLowerCase();
+                        if (text.includes(term) || term === '') {
+                            option.style.display = 'block';
+                            visibleCount++;
+                        } else {
+                            option.style.display = 'none';
+                        }
+                    });
+
+                    // Show/hide no results message
+                    if (visibleCount === 0 && term !== '') {
+                        locationNoResults.classList.remove('hidden');
+                        locationOptionsContainer.style.display = 'none';
+                    } else {
+                        locationNoResults.classList.add('hidden');
+                        locationOptionsContainer.style.display = 'block';
+                    }
+                }
+
+                function selectLocation(value) {
+                    locationInput.value = value;
+
+                    // Update selected state styling
+                    locationOptions.forEach(option => {
+                        if (option.dataset.value === value) {
+                            option.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'text-emerald-700', 'dark:text-emerald-400');
+                            option.classList.remove('text-slate-700', 'dark:text-slate-300');
+                        } else {
+                            option.classList.remove('bg-emerald-50', 'dark:bg-emerald-900/20', 'text-emerald-700', 'dark:text-emerald-400');
+                            option.classList.add('text-slate-700', 'dark:text-slate-300');
+                        }
+                    });
+
+                    toggleDropdown();
+                }
+
+                // Toggle dropdown on button click
+                if (locationDropdownToggle) {
+                    locationDropdownToggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleDropdown();
+                    });
+                }
+
+                // Toggle dropdown and filter on input focus/click
+                if (locationInput) {
+                    locationInput.addEventListener('focus', function() {
+                        if (!isDropdownOpen) {
+                            toggleDropdown();
+                        }
+                    });
+
+                    locationInput.addEventListener('click', function() {
+                        if (!isDropdownOpen) {
+                            toggleDropdown();
+                        }
+                    });
+
+                    // Filter options as user types
+                    locationInput.addEventListener('input', function(e) {
+                        if (!isDropdownOpen) {
+                            toggleDropdown();
+                        }
+                        filterOptions(e.target.value);
+                    });
+
+                    // Handle keyboard navigation
+                    locationInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (!isDropdownOpen) {
+                                toggleDropdown();
+                            } else {
+                                const firstVisible = Array.from(locationOptions).find(opt => opt.style.display !== 'none' && opt.style.display !== '');
+                                if (firstVisible) {
+                                    firstVisible.focus();
+                                }
+                            }
+                        } else if (e.key === 'Escape' && isDropdownOpen) {
+                            toggleDropdown();
+                        }
+                    });
+                }
+
+                // Select option on click
+                locationOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        selectLocation(this.dataset.value);
+                    });
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (locationDropdown && !locationDropdown.contains(e.target) &&
+                        locationInput && !locationInput.contains(e.target) &&
+                        locationDropdownToggle && !locationDropdownToggle.contains(e.target)) {
+                        if (isDropdownOpen) {
+                            toggleDropdown();
+                        }
+                    }
+                });
             });
         </script>
     </body>
