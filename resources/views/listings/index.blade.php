@@ -326,10 +326,10 @@
                                     @endphp
                                     <input type="hidden" name="status" value="{{ $currentStatus }}">
                                     <select name="sort" onchange="this.form.submit()" class="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                        <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
+                                        <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest Listing</option>
                                         <option value="price-low" {{ request('sort') === 'price-low' ? 'selected' : '' }}>Price: Low to High</option>
                                         <option value="price-high" {{ request('sort') === 'price-high' ? 'selected' : '' }}>Price: High to Low</option>
-                                        <option value="size-large" {{ request('sort') === 'size-large' ? 'selected' : '' }}>Size: Largest</option>
+                                        <option value="size-large" {{ request('sort') === 'size-large' ? 'selected' : '' }}>Size: Largest Land</option>
                                     </select>
                                 </form>
                             </div>
@@ -346,7 +346,8 @@
                                 @foreach($statusTabs as $statusValue => $statusLabel)
                                     @php
                                         $isActive = ($currentStatus === $statusValue);
-                                        $urlParams = request()->except(['status', 'page']);
+                                        // Clear location when changing status, preserve other filters
+                                        $urlParams = request()->except(['status', 'location', 'page']);
                                         $urlParams['status'] = $statusValue;
                                     @endphp
                                     <a
