@@ -37,6 +37,9 @@
                                         Regarding: {{ $message->listing->title }}
                                     </div>
                                 @endif
+                                <div class="text-xs opacity-75 mb-1 font-semibold">
+                                    {{ $message->sender_id === auth()->id() ? 'You' : $message->sender->name }}
+                                </div>
                                 <p class="text-sm">{{ $message->body }}</p>
                                 <p class="text-xs opacity-75 mt-1">
                                     {{ $message->created_at->format('M j, g:i A') }}

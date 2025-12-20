@@ -34,19 +34,19 @@
                     @if($conversations->count() > 0)
                         <div class="space-y-4">
                             @foreach($conversations as $conversation)
-                                <a href="{{ route('messages.show', $conversation->sender_id) }}" 
+                                <a href="{{ route('messages.show', $conversation->other_user_id) }}" 
                                    class="block p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4 flex-1">
                                             <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
                                                 <span class="text-white font-semibold">
-                                                    {{ strtoupper(substr($conversation->sender->name, 0, 1)) }}
+                                                    {{ strtoupper(substr($conversation->other_user->name, 0, 1)) }}
                                                 </span>
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center gap-2">
                                                     <p class="text-lg font-semibold text-slate-900 dark:text-white">
-                                                        {{ $conversation->sender->name }}
+                                                        {{ $conversation->other_user->name }}
                                                     </p>
                                                     @if($conversation->unread_count > 0)
                                                         <span class="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
