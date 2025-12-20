@@ -14,6 +14,8 @@ class Comment extends Model
         'body',
         'approved',
         'agree_count',
+        'ip_address',
+        'session_id',
     ];
 
     protected function casts(): array

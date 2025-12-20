@@ -384,133 +384,233 @@
 
 
         <!-- Comments Section -->
-        <section class="py-12 bg-slate-50 dark:bg-slate-900">
+        <section class="py-12 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Comments & Questions</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
+                    <!-- Header -->
+                    <div class="px-8 pt-8 pb-6 border-b border-slate-200 dark:border-slate-700">
+                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Comments & Questions</h2>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Share your thoughts or ask about this property</p>
+                    </div>
 
-                    <!-- Comment Form (guests and authenticated users) -->
-                    @php
-                        $commentSlug = \Illuminate\Support\Str::slug($listing->category) . '-' . \Illuminate\Support\Str::slug($listing->title) . '-' . \Illuminate\Support\Str::slug($listing->location);
-                    @endphp
-                    <form id="comment-form" method="POST" action="{{ route('listings.comments.store', ['listing' => $listing->id, 'slug' => $commentSlug]) }}" class="mb-8">
-                        @csrf
-                        <div class="space-y-4">
-                            @guest
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div>
-                                        <label for="guest_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Name</label>
-                                        <input id="guest_name" name="guest_name" value="{{ old('guest_name') }}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100" required>
-                                    </div>
-                                    <div>
-                                        <label for="guest_email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email (optional)</label>
-                                        <input id="guest_email" name="guest_email" value="{{ old('guest_email') }}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                    <!-- Comment Form -->
+                    <div class="p-8">
+                        @php
+                            $commentSlug = \Illuminate\Support\Str::slug($listing->category) . '-' . \Illuminate\Support\Str::slug($listing->title) . '-' . \Illuminate\Support\Str::slug($listing->location);
+                        @endphp
+
+                        @if(session('success'))
+                            <div class="mb-6 p-4 rounded-lg {{ session('comment_pending') ? 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' : 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800' }}">
+                                <div class="flex items-start gap-3">
+                                    @if(session('comment_pending'))
+                                        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                    @else
+                                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    @endif
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium {{ session('comment_pending') ? 'text-yellow-800 dark:text-yellow-300' : 'text-emerald-800 dark:text-emerald-300' }}">
+                                            {{ session('success') }}
+                                        </p>
                                     </div>
                                 </div>
-                            @endguest
-
-                            <div>
-                                <label for="body" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Comment</label>
-                                <textarea id="body" name="body" rows="4" class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none" placeholder="Share your thoughts or ask about this property..." required>{{ old('body') }}</textarea>
                             </div>
+                        @endif
 
-                            <div class="flex items-center justify-between">
-                                <div class="text-sm text-slate-500">You may comment as a guest or <a href="{{ route('login') }}" class="text-emerald-600">sign in</a> for a richer experience.</div>
+                        <form id="comment-form" method="POST" action="{{ route('listings.comments.store', ['listing' => $listing->id, 'slug' => $commentSlug]) }}" class="mb-8">
+                            @csrf
+                            <div class="space-y-4">
+                                @guest
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="guest_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Your Name <span class="text-red-500">*</span></label>
+                                            <input
+                                                id="guest_name"
+                                                name="guest_name"
+                                                value="{{ old('guest_name') }}"
+                                                class="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
+                                                placeholder="Enter your name"
+                                                required
+                                            >
+                                            @error('guest_name')
+                                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <div>
+                                            <label for="guest_email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email (optional)</label>
+                                            <input
+                                                id="guest_email"
+                                                name="guest_email"
+                                                type="email"
+                                                value="{{ old('guest_email') }}"
+                                                class="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
+                                                placeholder="your@email.com"
+                                            >
+                                            @error('guest_email')
+                                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                @endguest
+
                                 <div>
-                                    <button type="submit" id="submit-comment" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <label for="body" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Your Comment <span class="text-red-500">*</span></label>
+                                    <textarea
+                                        id="body"
+                                        name="body"
+                                        rows="5"
+                                        class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none transition-colors"
+                                        placeholder="Share your thoughts, ask questions, or provide feedback about this property..."
+                                        maxlength="2000"
+                                        required
+                                    >{{ old('body') }}</textarea>
+                                    <div class="mt-1 flex items-center justify-between">
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">Maximum 2000 characters</p>
+                                        @error('body')
+                                            <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2">
+                                    <div class="text-sm text-slate-600 dark:text-slate-400">
+                                        @guest
+                                            You're commenting as a guest. <a href="{{ route('login') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">Sign in</a> for a better experience.
+                                        @else
+                                            Commenting as <span class="font-medium text-slate-900 dark:text-white">{{ auth()->user()->name }}</span>
+                                        @endguest
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        id="submit-comment"
+                                        class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                                    >
                                         <span id="submit-text">Post Comment</span>
                                         <span id="loading-text" class="hidden">Posting...</span>
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
 
                     <!-- Comments Display -->
-                    <div id="comments-section">
+                    <div id="comments-section" class="px-8 pb-8">
                         @if($listing->comments->count() > 0)
-                            <div class="space-y-6">
-                                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                            <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+                                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-6">
                                     {{ $listing->comments->count() }} Comment{{ $listing->comments->count() !== 1 ? 's' : '' }}
                                 </h3>
 
-                                @foreach($listing->comments as $comment)
-                                    <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50" data-comment-id="{{ $comment->id }}">
-                                        <div class="flex items-start justify-between">
-                                            <div class="flex items-start space-x-3">
-                                                <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
-                                                    <span class="text-white font-medium text-sm">
+                                <div class="space-y-4">
+                                    @foreach($listing->comments as $comment)
+                                        <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-5 bg-slate-50 dark:bg-slate-700/30 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors" data-comment-id="{{ $comment->id }}">
+                                            <div class="flex items-start gap-4">
+                                                <!-- Avatar -->
+                                                <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <span class="text-white font-semibold text-sm">
                                                         {{ strtoupper(substr(optional($comment->user)->name ?? $comment->guest_name ?? 'G', 0, 1)) }}
                                                     </span>
                                                 </div>
-                                                <div class="flex-1">
-                                                    <div class="flex items-center justify-between mb-1">
-                                                        <div class="flex items-center gap-2">
-                                                            <span class="font-medium text-slate-900 dark:text-white">
+
+                                                <!-- Comment Content -->
+                                                <div class="flex-1 min-w-0">
+                                                    <!-- Header -->
+                                                    <div class="flex items-start justify-between mb-2">
+                                                        <div class="flex items-center gap-2 flex-wrap">
+                                                            <span class="font-semibold text-slate-900 dark:text-white">
                                                                 {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
                                                             </span>
-                                                            <span class="text-sm text-slate-500 dark:text-slate-400" title="{{ $comment->created_at->format('Y-m-d H:i:s') }}">
-                                                                {{ $comment->created_at->diffForHumans() }} · {{ $comment->created_at->format('Y-m-d H:i') }}
+                                                            @if($comment->user)
+                                                                <span class="px-2 py-0.5 text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full">
+                                                                    Verified User
+                                                                </span>
+                                                            @endif
+                                                            <span class="text-xs text-slate-500 dark:text-slate-400" title="{{ $comment->created_at->format('F j, Y \a\t g:i A') }}">
+                                                                {{ $comment->created_at->diffForHumans() }}
                                                             </span>
+                                                            @if(!$comment->approved)
+                                                                <span class="px-2 py-0.5 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full font-medium">
+                                                                    ⏳ Waiting for Approval
+                                                                </span>
+                                                            @endif
                                                         </div>
-                                                        <div class="flex items-center gap-3">
-                                                            <button onclick="handleAgree({{ $comment->id }})" class="agree-btn flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600">
-                                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l-3 6h4l3-6h-4zM5 13h4l3-6H8L5 13z"/></svg>
-                                                                <span class="agree-count" data-agree="{{ $comment->agree_count ?? 0 }}">{{ $comment->agree_count ?? 0 }}</span>
-                                                                @if(auth()->check())
-                                                                    <input type="hidden" class="agree-user-liked" value="{{ $comment->isLikedBy(auth()->user()) ? 1 : 0 }}">
-                                                                @endif
-                                                            </button>
+
+                                                        <!-- Action Buttons -->
+                                                        <div class="flex items-center gap-2 ml-2">
+                                                            @if(auth()->check() && auth()->id() === $comment->user_id)
+                                                                <button
+                                                                    onclick="editComment({{ $comment->id }}, {{ json_encode($comment->body) }})"
+                                                                    class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded transition-colors"
+                                                                    title="Edit comment"
+                                                                >
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                    </svg>
+                                                                </button>
+                                                                <button
+                                                                    onclick="deleteComment({{ $comment->id }})"
+                                                                    class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                                                    title="Delete comment"
+                                                                >
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                    </svg>
+                                                                </button>
+                                                            @endif
+
+                                                            @if(auth()->check() && auth()->user()->is_admin)
+                                                                <button
+                                                                    onclick="approveComment({{ $comment->id }})"
+                                                                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors {{ $comment->approved ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/40' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400' }}"
+                                                                    data-approved="{{ $comment->approved ? '1' : '0' }}"
+                                                                    id="approve-btn-{{ $comment->id }}"
+                                                                >
+                                                                    @if($comment->approved)
+                                                                        ✓ Approved
+                                                                    @else
+                                                                        Approve
+                                                                    @endif
+                                                                </button>
+                                                            @endif
                                                         </div>
                                                     </div>
-                                                    <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content text-left self-start mt-1">
+
+                                                    <!-- Comment Body -->
+                                                    <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed mb-3">
                                                         {{ $comment->body }}
                                                     </p>
+
+                                                    <!-- Like Button -->
+                                                    <div class="flex items-center">
+                                                        <button
+                                                            onclick="handleAgree({{ $comment->id }})"
+                                                            class="agree-btn inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
+                                                        >
+                                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.145 1.166.846 1.166h4.94c1.147 0 2.077.96 2.037 2.106-.033 1.223-.81 2.372-2.01 3.133-.453.29-.964.47-1.487.498-.2.015-.4.02-.603.022a7.78 7.78 0 01-.798-.005 3.05 3.05 0 00-.462-.006c-.204.002-.403.007-.603.022-.523.028-1.034.208-1.487.498-1.2.761-1.977 1.91-2.01 3.133-.04 1.146.89 2.106 2.037 2.106h4.94c.701 0 1.112-.608.846-1.166-.463-.975-.723-2.066-.723-3.218a2.25 2.25 0 012.25-2.25A.75.75 0 0021 9.25v-.464c0-1.021-.11-2.021-.322-2.96a4.498 4.498 0 00-.322-1.672V2.75z" />
+                                                            </svg>
+                                                            <span class="agree-count" data-agree="{{ $comment->agree_count ?? 0 }}">{{ $comment->agree_count ?? 0 }}</span>
+                                                            @if(auth()->check())
+                                                                <input type="hidden" class="agree-user-liked" value="{{ $comment->isLikedBy(auth()->user()) ? 1 : 0 }}">
+                                                            @endif
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-
-                                            <div class="flex items-center space-x-2 ml-4">
-                                                @if(auth()->check() && auth()->id() === $comment->user_id)
-                                                    <button
-                                                        onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->content ?? $comment->body) }}')"
-                                                        class="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onclick="deleteComment({{ $comment->id }})"
-                                                        class="text-sm text-red-600 hover:text-red-700 font-medium"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                @endif
-
-                                                @if(auth()->check() && auth()->user()->is_admin)
-                                                    <button
-                                                        onclick="approveComment({{ $comment->id }})"
-                                                        class="text-sm px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded-full text-slate-700 dark:text-slate-200 hover:bg-emerald-50 hover:text-emerald-700"
-                                                        data-approved="{{ $comment->approved ? '1' : '0' }}"
-                                                        id="approve-btn-{{ $comment->id }}"
-                                                    >
-                                                        @if($comment->approved)
-                                                            ✓ Approved
-                                                        @else
-                                                            ○ Approve
-                                                        @endif
-                                                    </button>
-                                                @endif
-                                            </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
                             </div>
                         @else
-                            <div class="text-center py-8">
-                                <svg class="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9 8s9 3.582 9 8z" />
+                            <div class="border-t border-slate-200 dark:border-slate-700 pt-8 text-center py-12">
+                                <svg class="w-20 h-20 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                                 </svg>
-                                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No comments yet</h3>
-                                <p class="text-slate-600 dark:text-slate-400">Be the first to ask a question or leave a comment!</p>
+                                <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">No comments yet</h3>
+                                <p class="text-slate-600 dark:text-slate-400 mb-6">Be the first to share your thoughts or ask a question about this property!</p>
                             </div>
                         @endif
                     </div>
@@ -767,19 +867,29 @@
                 }
             });
 
+            // Close edit modal on background click
+            document.getElementById('edit-modal')?.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditModal();
+                }
+            });
+
             // (Comment submission handled by single AJAX handler lower in the file.)
 
             // Edit comment functions
             function editComment(commentId, content) {
-                document.getElementById('edit-content').value = content;
+                const textarea = document.getElementById('edit-content');
+                textarea.value = content;
                 document.getElementById('edit-form').action = `/comments/${commentId}`;
                 document.getElementById('edit-modal').classList.remove('hidden');
                 document.getElementById('edit-modal').classList.add('flex');
+                document.body.style.overflow = 'hidden';
             }
 
             function closeEditModal() {
                 document.getElementById('edit-modal').classList.add('hidden');
                 document.getElementById('edit-modal').classList.remove('flex');
+                document.body.style.overflow = '';
             }
 
             // Update comment via AJAX
@@ -790,40 +900,59 @@
                 const updateBtn = document.getElementById('update-comment');
 
                 updateBtn.disabled = true;
-                updateBtn.textContent = 'Updating...';
+                document.getElementById('update-text').classList.add('hidden');
+                document.getElementById('update-loading').classList.remove('hidden');
 
                 const formData = new FormData(form);
+                formData.append('body', document.getElementById('edit-content').value);
+                formData.append('_method', 'PUT');
 
                 fetch(form.action, {
                     method: 'POST',
                     body: formData,
                     headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Failed to update comment');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        // Update the comment in the DOM instead of reloading
+                        const commentElement = document.querySelector(`[data-comment-id="${data.comment.id}"]`);
+                        if (commentElement) {
+                            const contentElement = commentElement.querySelector('.comment-content, p');
+                            if (contentElement) {
+                                contentElement.textContent = data.comment.body;
+                            }
+                        }
+                        closeEditModal();
                     } else {
-                        alert('Error updating comment. Please try again.');
+                        alert(data.message || 'Error updating comment. Please try again.');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error updating comment. Please try again.');
+                    alert(error.message || 'Error updating comment. Please try again.');
                 })
                 .finally(() => {
                     updateBtn.disabled = false;
-                    updateBtn.textContent = 'Update';
-                    closeEditModal();
+                    document.getElementById('update-text').classList.remove('hidden');
+                    document.getElementById('update-loading').classList.add('hidden');
                 });
             });
 
             // Delete comment
             function deleteComment(commentId) {
-                if (!confirm('Are you sure you want to delete this comment?')) {
+                if (!confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
                     return;
                 }
 
@@ -835,17 +964,41 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Failed to delete comment');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        // Remove comment from DOM
+                        const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+                        if (commentElement) {
+                            commentElement.style.transition = 'opacity 0.3s';
+                            commentElement.style.opacity = '0';
+                            setTimeout(() => {
+                                commentElement.remove();
+
+                                // Check if no comments left
+                                const commentsSection = document.getElementById('comments-section');
+                                const remainingComments = commentsSection.querySelectorAll('[data-comment-id]');
+                                if (remainingComments.length === 0) {
+                                    location.reload();
+                                }
+                            }, 300);
+                        } else {
+                            location.reload();
+                        }
                     } else {
-                        alert('Error deleting comment. Please try again.');
+                        alert(data.message || 'Error deleting comment. Please try again.');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error deleting comment. Please try again.');
+                    alert(error.message || 'Error deleting comment. Please try again.');
                 });
             }
 
@@ -875,61 +1028,23 @@
                             'Accept': 'application/json'
                         }
                     })
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.json().then(data => {
+                                throw new Error(data.message || 'Failed to post comment');
+                            });
+                        }
+                        return res.json();
+                    })
                     .then(data => {
                         if (data.success) {
-                            // prepend new comment to comments-section
-                            const commentsSection = document.getElementById('comments-section');
-                            const container = document.createElement('div');
-                            container.className = 'border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50 mb-4';
-                            const author = data.comment.user ? (data.comment.user.name) : (data.comment.guest_name || 'Guest');
-                            const time = `${formatDateTime(new Date())}`;
-                            const relative = 'just now';
-                            const body = data.comment.body;
-                            const commentId = data.comment.id || Math.floor(Math.random() * 1000000);
-                            const userLiked = isAuthenticated ? (data.comment.user && data.comment.user.id === {{ auth()->id() ?? 'null' }}) : false;
-                            container.innerHTML = `
-                                <div class="flex items-start justify-between" data-comment-id="${commentId}">
-                                    <div class="flex items-start space-x-3 w-full">
-                                        <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <span class="text-white font-medium text-sm">${(author || 'G').charAt(0).toUpperCase()}</span>
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="flex items-center justify-between mb-1">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="font-medium text-slate-900 dark:text-white">${author}</span>
-                                                    <span class="text-sm text-slate-500 dark:text-slate-400">${relative} · ${time}</span>
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <button onclick="handleAgree(${commentId})" class="agree-btn flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600">
-                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l-3 6h4l3-6h-4zM5 13h4l3-6H8L5 13z"/></svg>
-                                                        <span class="agree-count" data-agree="0">0</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">${body}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-
-                            // if there is a 'No comments yet' block, remove it
-                            const noComments = commentsSection.querySelector('.text-center.py-8');
-                            if (noComments) noComments.remove();
-
-                            // Prepend
-                            commentsSection.prepend(container);
-
-                            // initialize agree state for new item
-                            initAgreeFor(commentId);
-                            // if authenticated and server returned comment, set server like state if any
-                            if (isAuthenticated && data.comment.id) {
-                                // fetch liked state via DOM marker (server didn't return liked in store)
-                                // no-op: newly created comment cannot be liked yet by this user
+                            // Show success message
+                            if (data.approved === false) {
+                                // Show pending approval message
+                                alert('Your comment has been posted and is waiting for approval. It will be visible to others once approved.');
                             }
-
-                            // clear textarea
-                            document.getElementById('body').value = '';
+                            // Reload page to show new comment properly with all features
+                            location.reload();
                         } else {
                             alert(data.message || 'Failed to post comment');
                         }
@@ -982,7 +1097,13 @@
                         }
                         // update count and UI
                         el.textContent = data.agree_count ?? el.textContent;
-                        if (data.liked) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                        if (data.liked) {
+                            btn.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                            btn.querySelector('svg').classList.add('fill-emerald-600', 'dark:fill-emerald-400');
+                        } else {
+                            btn.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+                            btn.querySelector('svg').classList.remove('fill-emerald-600', 'dark:fill-emerald-400');
+                        }
                     })
                     .catch(err => {
                         console.error(err);
@@ -1003,7 +1124,13 @@
                     localStorage.setItem(stateKey, newState ? '1' : '0');
 
                     el.textContent = newCount;
-                    if (newState) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                    if (newState) {
+                        btn.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                        btn.querySelector('svg').classList.add('fill-emerald-600', 'dark:fill-emerald-400');
+                    } else {
+                        btn.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+                        btn.querySelector('svg').classList.remove('fill-emerald-600', 'dark:fill-emerald-400');
+                    }
                 }
             }
 
@@ -1018,7 +1145,15 @@
                     const likedInput = el.closest('[data-comment-id]').querySelector('.agree-user-liked');
                     if (likedInput) {
                         const liked = likedInput.value === '1';
-                        if (liked) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                        if (liked) {
+                            btn.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                            const svg = btn.querySelector('svg');
+                            if (svg) svg.classList.add('fill-emerald-600', 'dark:fill-emerald-400');
+                        } else {
+                            btn.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+                            const svg = btn.querySelector('svg');
+                            if (svg) svg.classList.remove('fill-emerald-600', 'dark:fill-emerald-400');
+                        }
                     }
                     // set count from data attribute unless overridden by localStorage
                     const savedCount = localStorage.getItem(countKey);
@@ -1034,7 +1169,15 @@
                         el.textContent = savedCount;
                     }
                     if (btn) {
-                        if (savedState) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                        if (savedState) {
+                            btn.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                            const svg = btn.querySelector('svg');
+                            if (svg) svg.classList.add('fill-emerald-600', 'dark:fill-emerald-400');
+                        } else {
+                            btn.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+                            const svg = btn.querySelector('svg');
+                            if (svg) svg.classList.remove('fill-emerald-600', 'dark:fill-emerald-400');
+                        }
                     }
                 }
             }

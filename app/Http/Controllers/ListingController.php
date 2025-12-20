@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ListingController extends Controller
 {
@@ -83,7 +84,7 @@ class ListingController extends Controller
      * Display the specified listing.
      *.http://localhost:8000/lands/1-residential-beachfront-property-in-boracay-boracay-aklan
      */
-    public function show(Listing $listing, $slug)
+    public function show(Request $request, Listing $listing, $slug)
     {
         $expected = Str::slug($listing->category).'-'.Str::slug($listing->title).'-'.Str::slug($listing->location);
 
@@ -92,9 +93,27 @@ class ListingController extends Controller
         }
 
         // eager load comments and commenter user
-        $listing->load(['comments' => function ($q) {
+        // For non-admin users, show approved comments OR unapproved comments from the same IP/session
+        $listing->load(['comments' => function ($q) use ($request) {
+            if (! auth()->check() || ! auth()->user()->is_admin) {
+                $currentIp = $request->ip();
+                $sessionId = $request->session()->getId();
+                
+                $q->where(function ($query) use ($currentIp, $sessionId) {
+                    // Show approved comments
+                    $query->where('approved', true)
+                        // OR show unapproved comments from the same IP/session
+                        ->orWhere(function ($q2) use ($currentIp, $sessionId) {
+                            $q2->where('approved', false)
+                                ->where(function ($q3) use ($currentIp, $sessionId) {
+                                    $q3->where('ip_address', $currentIp)
+                                        ->orWhere('session_id', $sessionId);
+                                });
+                        });
+                });
+            }
             $q->latest();
-        }, 'comments.user']);
+        }, 'comments.user', 'comments.likes']);
 
         return view('listings.show', [
             'listing' => $listing,

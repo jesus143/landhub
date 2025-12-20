@@ -56,6 +56,8 @@ class CommentsController extends Controller
         $comment = new Comment();
         $comment->listing_id = $listing->id;
         $comment->body = $body;
+        $comment->ip_address = $request->ip();
+        $comment->session_id = $request->session()->getId();
 
         if ($request->user()) {
             $comment->user_id = $request->user()->id;
@@ -70,27 +72,76 @@ class CommentsController extends Controller
 
         $comment->load('user');
 
+        $message = $comment->approved
+            ? 'Comment posted successfully.'
+            : 'Your comment has been posted and is waiting for approval. It will be visible to others once approved.';
+
         if ($request->wantsJson() || $request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Comment posted successfully.',
+                'message' => $message,
                 'comment' => $comment,
+                'approved' => $comment->approved,
             ]);
         }
 
-        return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $slug])->with('success', 'Comment posted successfully.');
+        return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $slug])
+            ->with('success', $message)
+            ->with('comment_pending', !$comment->approved);
     }
 
-    // Keep update/delete behavior to authenticated and authorized users only.
-    public function update($request, Comment $comment)
+    /**
+     * Update a comment. Only the comment owner can update.
+     */
+    public function update(Request $request, Comment $comment): JsonResponse
     {
-        // left as-is or implement later
-        abort(404);
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Authentication required'], 401);
+        }
+
+        // Check if user owns the comment
+        if ($comment->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'body' => 'required|string|max:5000',
+        ]);
+
+        $comment->body = $validated['body'];
+        $comment->save();
+
+        $comment->load('user');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment updated successfully.',
+            'comment' => $comment,
+        ]);
     }
 
-    public function destroy($request, Comment $comment)
+    /**
+     * Delete a comment. Only the comment owner can delete.
+     */
+    public function destroy(Request $request, Comment $comment): JsonResponse
     {
-        abort(404);
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Authentication required'], 401);
+        }
+
+        // Check if user owns the comment
+        if ($comment->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment deleted successfully.',
+        ]);
     }
 
     /**

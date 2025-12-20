@@ -54,6 +54,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/comments/{comment}/approve', [\App\Http\Controllers\CommentsController::class, 'approve'])->name('comments.approve');
     // Comment like/agree (toggle) - authenticated users
     Route::post('/comments/{comment}/agree', [\App\Http\Controllers\CommentsController::class, 'agree'])->name('comments.agree');
+    // Comment update and delete - only comment owner
+    Route::put('/comments/{comment}', [\App\Http\Controllers\CommentsController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [\App\Http\Controllers\CommentsController::class, 'destroy'])->name('comments.destroy');
 });
 
 require __DIR__.'/auth.php';
