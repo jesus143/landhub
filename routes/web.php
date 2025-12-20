@@ -15,20 +15,34 @@ Route::get('/lands/{listing}-{slug}', [ListingController::class, 'show'])->name(
 Route::post('/lands/{listing}-{slug}/comments', [\App\Http\Controllers\CommentsController::class, 'store'])->name('listings.comments.store');
 
 Route::get('/dashboard', function () {
-    $stats = [
-        'total_listings' => \App\Models\Listing::count(),
-        'active_listings' => \App\Models\Listing::where('status', 'for_sale')->count(),
-        'pending_listings' => \App\Models\Listing::where('status', 'pending')->count(),
-        'sold_listings' => \App\Models\Listing::where('status', 'sold')->count(),
-        'total_users' => \App\Models\User::count(),
-        'total_comments' => \App\Models\Comment::count(),
-        'approved_comments' => \App\Models\Comment::where('approved', true)->count(),
-        'pending_comments' => \App\Models\Comment::where('approved', false)->count(),
-        'total_likes' => \App\Models\CommentLike::count(),
-        'total_listing_value' => \App\Models\Listing::where('status', 'for_sale')->sum('price'),
-        'average_price' => \App\Models\Listing::where('status', 'for_sale')->avg('price'),
-        'total_area' => \App\Models\Listing::sum('area'),
-    ];
+    $user = auth()->user();
+    
+    if ($user->is_admin) {
+        // Admin statistics
+        $stats = [
+            'total_listings' => \App\Models\Listing::count(),
+            'active_listings' => \App\Models\Listing::where('status', 'for_sale')->count(),
+            'pending_listings' => \App\Models\Listing::where('status', 'pending')->count(),
+            'sold_listings' => \App\Models\Listing::where('status', 'sold')->count(),
+            'total_users' => \App\Models\User::count(),
+            'total_comments' => \App\Models\Comment::count(),
+            'approved_comments' => \App\Models\Comment::where('approved', true)->count(),
+            'pending_comments' => \App\Models\Comment::where('approved', false)->count(),
+            'total_likes' => \App\Models\CommentLike::count(),
+            'total_listing_value' => \App\Models\Listing::where('status', 'for_sale')->sum('price'),
+            'average_price' => \App\Models\Listing::where('status', 'for_sale')->avg('price'),
+            'total_area' => \App\Models\Listing::sum('area'),
+            'unread_messages' => \App\Models\Message::whereNull('read_at')->count(),
+        ];
+    } else {
+        // Customer statistics
+        $stats = [
+            'sent_messages' => $user->sentMessages()->count(),
+            'received_messages' => $user->receivedMessages()->count(),
+            'unread_messages' => $user->unreadMessagesCount(),
+            'total_listings' => \App\Models\Listing::where('status', 'for_sale')->count(), // Available listings to browse
+        ];
+    }
 
     return view('dashboard', compact('stats'));
 })->middleware(['auth', 'verified'])->name('dashboard');
