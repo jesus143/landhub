@@ -17,12 +17,19 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-1 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('listings.index')" :active="request()->routeIs('listings.*')">
-                        {{ __('Browse Listings') }}
-                    </x-nav-link>
+
+                    <div class="relative inline-flex items-center">
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    </div>
+
+                    <div class="relative inline-flex items-center">
+                        <x-nav-link :href="route('listings.index')" :active="request()->routeIs('listings.*')">
+                            {{ __('Browse Listings') }}
+                        </x-nav-link>
+                    </div>
+
                     <div class="relative inline-flex items-center">
                         <x-nav-link :href="route('messages.inbox')" :active="request()->routeIs('messages.*')">
                             {{ __('Messages') }}
@@ -34,11 +41,20 @@
                             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $unreadCount }}</span>
                         @endif
                     </div>
+
                     @if(Auth::check() && Auth::user()->is_admin)
+                        <div class="relative inline-flex items-center">
+                            <x-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.*')">
+                            {{ __('Admin') }}
+                            </x-nav-link>
+                        </div>
+                    @endif
+
+                    {{-- @if(Auth::check() && Auth::user()->is_admin)
                         <x-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.*')">
                             {{ __('Admin') }}
                         </x-nav-link>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
 
@@ -111,6 +127,8 @@
             <x-responsive-nav-link :href="route('listings.index')" :active="request()->routeIs('listings.*')">
                 {{ __('Browse Listings') }}
             </x-responsive-nav-link>
+
+
             <x-responsive-nav-link :href="route('messages.inbox')" :active="request()->routeIs('messages.*')" class="relative">
                 {{ __('Messages') }}
                 @php
@@ -120,6 +138,8 @@
                     <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount }}</span>
                 @endif
             </x-responsive-nav-link>
+
+
             @if(Auth::check() && Auth::user()->is_admin)
                 <x-responsive-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.*')">
                     {{ __('Admin') }}

@@ -1,16 +1,16 @@
 
 <x-guest-layout>
     <!-- Header -->
-    <div class="mb-8 text-center">
-        <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Create Account</h2>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Join LandHub to start browsing listings</p>
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Create Account</h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Join LandHub to start browsing listings</p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}" class="space-y-6">
+    <form method="POST" action="{{ route('register') }}" class="space-y-4">
         @csrf
 
         <!-- Two Column Grid for Name and Email -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- Name -->
             <div>
                 <x-input-label for="name" :value="__('Name')" />
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Two Column Grid for Password and Confirm Password -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- Password -->
             <div>
                 <x-input-label for="password" :value="__('Password')" />

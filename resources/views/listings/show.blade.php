@@ -319,21 +319,30 @@
                         <!-- Contact Information -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
                             <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Contact Information</h3>
-                            
+
                             @auth
+
+
                                 @php
+
                                     $sellerEmail = $listing->contact_email;
                                     $seller = $sellerEmail ? \App\Models\User::where('email', $sellerEmail)->first() : null;
+
+                                    // dd($seller);
                                 @endphp
+
+
                                 @if($seller && $seller->id !== auth()->id())
                                     <div class="mb-6">
                                         <a href="{{ route('messages.create.listing', $listing) }}" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-colors">
                                             <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                             </svg>
-                                            Message Seller
+                                            Message Seller in the platform
                                         </a>
                                     </div>
+                                @else
+
                                 @endif
                             @else
                                 <div class="mb-6">
@@ -341,7 +350,7 @@
                                         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
-                                        Message Seller
+                                        Message Seller in the platform
                                     </a>
                                 </div>
                             @endauth

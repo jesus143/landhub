@@ -58,14 +58,14 @@
                     <form action="{{ route('messages.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="receiver_id" value="{{ $otherUser->id }}">
-                        
+
                         <div class="flex gap-4">
                             <div class="flex-1">
-                                <textarea 
-                                    name="body" 
-                                    rows="3" 
+                                <textarea
+                                    name="body"
+                                    rows="3"
                                     required
-                                    class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                                    class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm p-3"
                                     placeholder="Type your message..."></textarea>
                                 @error('body')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>

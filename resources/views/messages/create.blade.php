@@ -59,12 +59,12 @@
                             <label for="body" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Message
                             </label>
-                            <textarea 
-                                name="body" 
-                                id="body" 
-                                rows="6" 
+                            <textarea
+                                name="body"
+                                id="body"
+                                rows="6"
                                 required
-                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm p-3"
                                 placeholder="Type your message...">{{ old('body') }}</textarea>
                             @error('body')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>

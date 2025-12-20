@@ -33,7 +33,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 121.9248,
                 'nearby_landmarks' => 'White Beach, D\'Mall, Station 2',
                 'contact_phone' => '+63 917 123 4567',
-                'contact_email' => 'boracay@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -55,7 +55,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 121.4663,
                 'nearby_landmarks' => 'Calamba City, Pagsanjan Falls',
                 'contact_phone' => '+63 917 234 5678',
-                'contact_email' => 'laguna@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -78,7 +78,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 121.0244,
                 'nearby_landmarks' => 'Ayala Avenue, Greenbelt Mall',
                 'contact_phone' => '+63 917 345 6789',
-                'contact_email' => 'makati@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -100,7 +100,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 120.5960,
                 'nearby_landmarks' => 'Burnham Park, Session Road',
                 'contact_phone' => '+63 917 456 7890',
-                'contact_email' => 'baguio@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -124,7 +124,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 120.9886,
                 'nearby_landmarks' => 'Cabanatuan City, Palayan City',
                 'contact_phone' => '+63 917 567 8901',
-                'contact_email' => 'nuevaecija@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -146,7 +146,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 123.8854,
                 'nearby_landmarks' => 'Ayala Center, SM City Cebu',
                 'contact_phone' => '+63 917 678 9012',
-                'contact_email' => 'cebu@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -170,7 +170,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 118.7384,
                 'nearby_landmarks' => 'Puerto Princesa, El Nido',
                 'contact_phone' => '+63 917 789 0123',
-                'contact_email' => 'palawan@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
             [
@@ -192,7 +192,7 @@ class ListingSeeder extends Seeder
                 'longitude' => 125.4553,
                 'nearby_landmarks' => 'Davao City, Mount Apo',
                 'contact_phone' => '+63 917 890 1234',
-                'contact_email' => 'davao@landhub.com',
+                'contact_email' => 'admin@example.com',
                 'contact_fb_link' => 'https://www.facebook.com/messages/t/27921919920740816',
             ],
         ];

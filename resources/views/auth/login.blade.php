@@ -1,14 +1,14 @@
 <x-guest-layout>
     <!-- Header -->
-    <div class="mb-8 text-center">
-        <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Welcome Back</h2>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Sign in to your account to continue</p>
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Sign in to your account to continue</p>
     </div>
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+    <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
         <!-- Email Address -->
