@@ -516,12 +516,12 @@
                                                 </div>
 
                                                 <!-- Comment Content -->
-                                                <div class="flex-1 min-w-0">
+                                                <div class="flex-1 min-w-0 text-left">
                                                     <!-- Header -->
                                                     <div class="flex items-start justify-between mb-2">
                                                         <div class="flex items-center gap-2 flex-wrap">
                                                             <span class="font-semibold text-slate-900 dark:text-white">
-                                                                {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
+                                                                {{ ucwords( optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' )}}
                                                             </span>
                                                             @if($comment->user)
                                                                 <span class="px-2 py-0.5 text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full">
@@ -577,14 +577,14 @@
                                                             @endif
                                                         </div>
                                                     </div>
-
-                                                    <!-- Comment Body -->
-                                                    <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed mb-3">
-                                                        {{ $comment->body }}
-                                                    </p>
+                                                    <div class="flex items-start justify-start">
+                                                        <p class=" text-left">
+                                                            {{ ucfirst($comment->body) }} asd asdas
+                                                        </p>
+                                                    </div>
 
                                                     <!-- Like Button -->
-                                                    <div class="flex items-center">
+                                                    <div class="flex items-center " style="display:none">
                                                         <button
                                                             onclick="handleAgree({{ $comment->id }})"
                                                             class="agree-btn inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
@@ -931,7 +931,10 @@
                         if (commentElement) {
                             const contentElement = commentElement.querySelector('.comment-content, p');
                             if (contentElement) {
-                                contentElement.textContent = data.comment.body;
+                                // Capitalize first letter and ensure left alignment
+                                const capitalizedBody = data.comment.body.charAt(0).toUpperCase() + data.comment.body.slice(1);
+                                contentElement.textContent = capitalizedBody;
+                                contentElement.classList.add('text-left');
                             }
                         }
                         closeEditModal();
