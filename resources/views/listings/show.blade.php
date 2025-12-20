@@ -320,6 +320,7 @@
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
                             <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Contact Information</h3>
 
+
                             @auth
 
 
@@ -338,7 +339,7 @@
                                             <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                             </svg>
-                                            Message Seller in the platform
+                                            Contact via platform
                                         </a>
                                     </div>
                                 @else
@@ -350,41 +351,19 @@
                                         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
-                                        Message Seller in the platform
+                                        Contact via platform
                                     </a>
                                 </div>
                             @endauth
 
                             <div class="space-y-3 mb-6">
-                                @if($listing->contact_phone)
-                                    <div class="flex items-center gap-3">
-                                        <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                        <a href="tel:{{ $listing->contact_phone }}" class="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400">
-                                            {{ $listing->contact_phone }}
-                                        </a>
-                                    </div>
-                                @endif
-                                @if($listing->contact_email)
-                                    <div class="flex items-center gap-3">
-                                        <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        <a href="mailto:{{ $listing->contact_email }}" class="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400">
-                                            {{ $listing->contact_email }}
-                                        </a>
-                                    </div>
-                                @endif
                                 @if($listing->contact_fb_link)
-                                    <div class="flex items-center gap-3">
-                                        <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <button onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2" title="Contact via Messenger">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 0C5.373 0 0 4.925 0 11c0 1.906.52 3.7 1.42 5.24L0 24l7.8-4.05C9.4 20.55 10.65 20.8 12 20.8c6.627 0 12-4.925 12-11S18.627 0 12 0zm0 18.8c-1.15 0-2.25-.2-3.3-.55l-.45-.15-4.65 2.4 1.05-4.5-.3-.45C3.7 14.3 3.2 12.7 3.2 11c0-4.4 3.9-8 8.8-8s8.8 3.6 8.8 8-3.9 8-8.8 8z"/>
                                         </svg>
-                                        <button onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 text-left">
-                                            Contact via Messenger
-                                        </button>
-                                    </div>
+                                        <span class="hidden sm:inline">Contact via Messenger</span>
+                                    </button>
                                 @endif
                             </div>
 
@@ -615,7 +594,7 @@
                                                     </div>
                                                     <div class="flex items-start justify-start">
                                                         <p class=" text-left">
-                                                            {{ ucfirst($comment->body) }} asd asdas
+                                                            {{ ucfirst($comment->body) }}
                                                         </p>
                                                     </div>
 
@@ -738,19 +717,22 @@
 
             function openMessenger(fbLink) {
                 const userId = fbLink.split('/').pop();
+                const message = encodeURIComponent("Hello, I'm interested in your listing!");
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
                 if (isMobile) {
-                    const messengerAppUrl = `fb-messenger://user/${userId}`;
-                    const messengerWebUrl = `https://m.facebook.com/messages/t/${userId}`;
+                    const messengerAppUrl = `fb-messenger://user/${userId}?text=${message}`;
+                    const messengerWebUrl = `https://m.facebook.com/messages/t/${userId}?text=${message}`;
                     window.location.href = messengerAppUrl;
                     setTimeout(function() {
                         window.open(messengerWebUrl, '_blank');
                     }, 1000);
                 } else {
-                    window.open(fbLink, '_blank');
+                    const separator = fbLink.includes('?') ? '&' : '?';
+                    window.open(`${fbLink}${separator}text=${message}`, '_blank');
                 }
             }
+
 
             function shareOnFacebook() {
                 const url = encodeURIComponent(window.location.href);

@@ -98,7 +98,7 @@ class ListingController extends Controller
             if (! auth()->check() || ! auth()->user()->is_admin) {
                 $currentIp = $request->ip();
                 $sessionId = $request->session()->getId();
-                
+
                 $q->where(function ($query) use ($currentIp, $sessionId) {
                     // Show approved comments
                     $query->where('approved', true)
@@ -113,7 +113,7 @@ class ListingController extends Controller
                 });
             }
             $q->latest();
-        }, 'comments.user', 'comments.likes']);
+        }, 'comments.user', 'comments.likes', 'user']);
 
         return view('listings.show', [
             'listing' => $listing,

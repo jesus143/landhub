@@ -424,14 +424,14 @@
                                             </div>
                                             <div class="flex gap-3">
                                                 <a href="{{ route('listings.show', ['listing' => $listing->id, 'slug' => \Illuminate\Support\Str::slug($listing->title)]) }}" class="flex-1 text-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
-                                                    View Details
+                                                    View
                                                 </a>
                                                 @if($listing->contact_fb_link)
-                                                    <button onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2" title="Contact via Messenger">
+                                                    <button title="Contact via Messenger" onclick="openMessenger('{{ $listing->contact_fb_link }}')" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2" title="Contact via Messenger">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                             <path d="M12 0C5.373 0 0 4.925 0 11c0 1.906.52 3.7 1.42 5.24L0 24l7.8-4.05C9.4 20.55 10.65 20.8 12 20.8c6.627 0 12-4.925 12-11S18.627 0 12 0zm0 18.8c-1.15 0-2.25-.2-3.3-.55l-.45-.15-4.65 2.4 1.05-4.5-.3-.45C3.7 14.3 3.2 12.7 3.2 11c0-4.4 3.9-8 8.8-8s8.8 3.6 8.8 8-3.9 8-8.8 8z"/>
                                                         </svg>
-                                                        <span class="hidden sm:inline">Messenger</span>
+                                                        <span class="hidden sm:inline"></span>
                                                     </button>
                                                 @endif
                                             </div>
