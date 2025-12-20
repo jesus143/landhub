@@ -64,8 +64,14 @@ class ListingController extends Controller
 
         $listings = $query->paginate(12)->withQueryString();
 
-        // Get all unique locations for the dropdown (from all listings, not just current page)
-        $locations = Listing::distinct()->orderBy('location', 'asc')->pluck('location')->filter()->values();
+        // Get unique locations for the dropdown filtered by the selected status
+        // This ensures locations shown are only those that have listings in the current status
+        $statusForLocations = $request->get('status', 'for_sale');
+        $locationsQuery = Listing::query();
+        if (! empty($statusForLocations)) {
+            $locationsQuery->where('status', $statusForLocations);
+        }
+        $locations = $locationsQuery->distinct()->orderBy('location', 'asc')->pluck('location')->filter()->values();
 
         return view('listings.index', [
             'listings' => $listings,
