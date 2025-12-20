@@ -20,6 +20,9 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
         <script src="{{ asset('tailwindcss.js') }}"></script>
+        @auth
+            @vite(['resources/js/app.js'])
+        @endauth
         <style type="text/tailwindcss">
             @theme {
                 --color-clifford: #da373d;
@@ -44,34 +47,32 @@
     </head>
     <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen">
         <!-- Navigation -->
-        <header class="w-full bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-50">
-            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <a href="{{ route('welcome') }}" class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                        </div>
-                        <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
-                    </a>
-                    <div class="flex items-center gap-4">
-                        <a href="{{ route('listings.index') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-                            Back to Search
+        @auth
+            @include('layouts.navigation')
+        @else
+            <header class="w-full bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-50">
+                <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between h-16">
+                        <a href="{{ route('welcome') }}" class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                            </div>
+                            <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
                         </a>
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-                                Dashboard
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('listings.index') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                                Back to Search
                             </a>
-                        @else
-                            <a href="{{ route('login') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" style="display:none">
+                            <a href="{{ route('login') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                                 Log in
                             </a>
-                        @endauth
+                        </div>
                     </div>
-                </div>
-            </nav>
-        </header>
+                </nav>
+            </header>
+        @endauth
 
         <!-- Breadcrumbs -->
         <section class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 py-4">
@@ -443,28 +444,28 @@
                                                     </span>
                                                 </div>
                                                 <div class="flex-1">
-                                                                        <div class="flex items-center justify-between mb-1">
-                                                                            <div class="flex items-center gap-2">
-                                                                                <span class="font-medium text-slate-900 dark:text-white">
-                                                                                    {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
-                                                                                </span>
-                                                                                <span class="text-sm text-slate-500 dark:text-slate-400" title="{{ $comment->created_at->format('Y-m-d H:i:s') }}">
-                                                                                    {{ $comment->created_at->diffForHumans() }} · {{ $comment->created_at->format('Y-m-d H:i') }}
-                                                                                </span>
-                                                                            </div>
-                                                                            <div class="flex items-center gap-3">
-                                                                                <button onclick="handleAgree({{ $comment->id }})" class="agree-btn flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600">
-                                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l-3 6h4l3-6h-4zM5 13h4l3-6H8L5 13z"/></svg>
-                                                                                    <span class="agree-count" data-agree="{{ $comment->agree_count ?? 0 }}">{{ $comment->agree_count ?? 0 }}</span>
-                                                                                    @if(auth()->check())
-                                                                                        <input type="hidden" class="agree-user-liked" value="{{ $comment->isLikedBy(auth()->user()) ? 1 : 0 }}">
-                                                                                    @endif
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                        <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">
-                                                                            {{ $comment->body }}
-                                                                        </p>
+                                                    <div class="flex items-center justify-between mb-1">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="font-medium text-slate-900 dark:text-white">
+                                                                {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
+                                                            </span>
+                                                            <span class="text-sm text-slate-500 dark:text-slate-400" title="{{ $comment->created_at->format('Y-m-d H:i:s') }}">
+                                                                {{ $comment->created_at->diffForHumans() }} · {{ $comment->created_at->format('Y-m-d H:i') }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <button onclick="handleAgree({{ $comment->id }})" class="agree-btn flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600">
+                                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l-3 6h4l3-6h-4zM5 13h4l3-6H8L5 13z"/></svg>
+                                                                <span class="agree-count" data-agree="{{ $comment->agree_count ?? 0 }}">{{ $comment->agree_count ?? 0 }}</span>
+                                                                @if(auth()->check())
+                                                                    <input type="hidden" class="agree-user-liked" value="{{ $comment->isLikedBy(auth()->user()) ? 1 : 0 }}">
+                                                                @endif
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content text-left self-start mt-1">
+                                                        {{ $comment->body }}
+                                                    </p>
                                                 </div>
                                             </div>
 

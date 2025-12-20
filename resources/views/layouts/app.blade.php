@@ -9,30 +9,25 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite([
-            // 'resources/css/app.css',
-            'resources/js/app.js'
-        ])
+        @vite(['resources/js/app.js'])
 
-                <script src="{{ asset('tailwindcss.js') }}"></script>
+        <script src="{{ asset('tailwindcss.js') }}"></script>
         <style type="text/tailwindcss">
             @theme {
                 --color-clifford: #da373d;
             }
-
-            </style>
-
+        </style>
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+        <div class="min-h-screen">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
+                <header class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -40,7 +35,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main class="min-h-[calc(100vh-4rem)]">
                 @isset($slot)
                     {{ $slot }}
                 @else
