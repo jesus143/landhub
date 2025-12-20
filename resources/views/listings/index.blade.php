@@ -80,23 +80,37 @@
             </div>
         </section>
 
-        <!-- Search & Filters removed from top; moved into sidebar in Results Section -->
-
-        <!-- Results Section with left filters sidebar -->
-        <section class="py-12">
+        <!-- Results Section -->
+        <section class="py-6 md:py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <!-- Left sidebar: Filters -->
-                    <aside class="w-full md:w-80 lg:w-96">
-                        <div class="sticky top-24">
-                            <form method="GET" action="{{ route('listings.index') }}" class="space-y-4 bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <!-- Keyword Search -->
-                                <div>
-                                    <label for="search" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        Search by keyword, location, title, or description
-                                    </label>
-                                    <div class="flex items-center gap-3 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900">
-                                        <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Mobile Filter Toggle Button -->
+                <div class="mb-4 md:hidden">
+                    <button
+                        type="button"
+                        id="filter-toggle"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                        <span class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Filters
+                        </span>
+                        <svg id="filter-toggle-icon" class="w-5 h-5 text-slate-500 dark:text-slate-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Filters Sidebar (Toggleable) -->
+                    <aside id="filters-sidebar" class="hidden md:block lg:w-72 xl:w-80">
+                        <div class="lg:sticky lg:top-24">
+                            <form method="GET" action="{{ route('listings.index') }}" class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <!-- Compact Keyword Search -->
+                                <div class="mb-4">
+                                    <div class="flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900">
+                                        <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                         <input
@@ -104,84 +118,73 @@
                                             id="search"
                                             name="search"
                                             value="{{ request('search') }}"
-                                            placeholder="e.g., 'Manila', 'beachfront', '500 sqm'..."
-                                            class="flex-1 bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none"
+                                            placeholder="Search listings..."
+                                            class="flex-1 bg-transparent text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none"
                                         />
                                     </div>
                                 </div>
 
-                                <!-- Filters Row -->
-                                <div class="grid grid-cols-1 gap-4">
-                                    <!-- Location Filter (search + dropdown) -->
+                                <!-- Compact Filters -->
+                                <div class="space-y-3">
+                                    <!-- Location -->
                                     <div>
-                                        <label for="location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            Location
-                                        </label>
+                                        <label for="location" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Location</label>
                                         @php
                                             $locationOptions = $locations ?? ($listings->pluck('location')->unique()->filter()->values() ?? collect());
                                         @endphp
-                                        <div class="flex flex-col gap-2">
-                                            <input
-                                                type="text"
-                                                id="location"
-                                                name="location"
-                                                value="{{ request('location') }}"
-                                                placeholder="Type or choose a location..."
-                                                list="location-list"
-                                                class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                            />
+                                        <input
+                                            type="text"
+                                            id="location"
+                                            name="location"
+                                            value="{{ request('location') }}"
+                                            placeholder="Any location"
+                                            list="location-list"
+                                            class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                        />
+                                        <datalist id="location-list">
+                                            @foreach($locationOptions as $loc)
+                                                <option value="{{ $loc }}"></option>
+                                            @endforeach
+                                        </datalist>
+                                    </div>
 
-                                            <datalist id="location-list">
-                                                @foreach($locationOptions as $loc)
-                                                    <option value="{{ $loc }}"></option>
-                                                @endforeach
-                                            </datalist>
+                                    <!-- Price Range -->
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label for="min_price" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Min Price</label>
+                                            <input
+                                                type="number"
+                                                id="min_price"
+                                                name="min_price"
+                                                value="{{ request('min_price') }}"
+                                                placeholder="0"
+                                                min="0"
+                                                step="1000"
+                                                class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label for="max_price" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Max Price</label>
+                                            <input
+                                                type="number"
+                                                id="max_price"
+                                                name="max_price"
+                                                value="{{ request('max_price') }}"
+                                                placeholder="Any"
+                                                min="0"
+                                                step="1000"
+                                                class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            />
                                         </div>
                                     </div>
 
-                                    <!-- Min Price -->
+                                    <!-- Category -->
                                     <div>
-                                        <label for="min_price" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            Min Price (₱)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            id="min_price"
-                                            name="min_price"
-                                            value="{{ request('min_price') }}"
-                                            placeholder="0"
-                                            min="0"
-                                            step="1000"
-                                            class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                        />
-                                    </div>
-
-                                    <!-- Max Price -->
-                                    <div>
-                                        <label for="max_price" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            Max Price (₱)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            id="max_price"
-                                            name="max_price"
-                                            value="{{ request('max_price') }}"
-                                            placeholder="No limit"
-                                            min="0"
-                                            step="1000"
-                                            class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                        />
-                                    </div>
-
-                                    <!-- Category Filter -->
-                                    <div>
-                                        <label for="category" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                            Category
-                                        </label>
+                                        <label for="category" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
                                         <select
                                             id="category"
                                             name="category"
-                                            class="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                            class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         >
                                             <option value="">All Categories</option>
                                             <option value="residential" {{ request('category') === 'residential' ? 'selected' : '' }}>Residential</option>
@@ -191,13 +194,13 @@
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="flex flex-col sm:flex-row gap-3">
-                                    <button type="submit" class="flex-1 px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors shadow-lg">
-                                        Search Listings
+                                <!-- Compact Action Buttons -->
+                                <div class="mt-4 flex gap-2">
+                                    <button type="submit" class="flex-1 px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
+                                        Apply
                                     </button>
-                                    <a href="{{ route('listings.index') }}" class="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium rounded-lg transition-colors text-center">
-                                        Clear Filters
+                                    <a href="{{ route('listings.index') }}" class="px-4 py-2 text-sm border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium rounded-lg transition-colors">
+                                        Clear
                                     </a>
                                 </div>
                             </form>
@@ -205,46 +208,58 @@
                     </aside>
 
                     <!-- Main: Results -->
-                    <main class="flex-1">
+                    <main class="flex-1 min-w-0">
                         <!-- Active Filters -->
-                        @if(request()->anyFilled(['search', 'location', 'min_price', 'max_price', 'category']))
-                            <div class="mb-6 flex flex-wrap items-center gap-2">
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Active filters:</span>
-                                @if(request('search'))
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                        @php
+                            $hasActiveFilters = (trim(request('search', '')) !== '') ||
+                                                (trim(request('location', '')) !== '') ||
+                                                (request('category', '') !== '') ||
+                                                (request('min_price', '') !== '' && request('min_price') > 0) ||
+                                                (request('max_price', '') !== '' && request('max_price') > 0);
+                        @endphp
+                        @if($hasActiveFilters)
+                            <div class="mb-4 flex flex-wrap items-center gap-2">
+                                <span class="text-xs font-medium text-slate-600 dark:text-slate-400">Active filters:</span>
+                                @if(trim(request('search', '')) !== '')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-xs">
                                         Search: "{{ request('search') }}"
                                         <a href="{{ route('listings.index', request()->except('search')) }}" class="hover:text-emerald-600">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </a>
                                     </span>
                                 @endif
-                                @if(request('location'))
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                                @if(trim(request('location', '')) !== '')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-xs">
                                         Location: {{ request('location') }}
                                         <a href="{{ route('listings.index', request()->except('location')) }}" class="hover:text-emerald-600">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </a>
                                     </span>
                                 @endif
-                                @if(request('category'))
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
+                                @if(request('category', '') !== '')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-xs">
                                         Category: {{ ucfirst(request('category')) }}
                                         <a href="{{ route('listings.index', request()->except('category')) }}" class="hover:text-emerald-600">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </a>
                                     </span>
                                 @endif
-                                @if(request('min_price') || request('max_price'))
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-sm">
-                                        Price: ₱{{ number_format(request('min_price', 0), 0) }} - {{ request('max_price') ? '₱' . number_format(request('max_price'), 0) : '∞' }}
+                                @php
+                                    $minPrice = request('min_price', '');
+                                    $maxPrice = request('max_price', '');
+                                    $hasPriceFilter = ($minPrice !== '' && $minPrice > 0) || ($maxPrice !== '' && $maxPrice > 0);
+                                @endphp
+                                @if($hasPriceFilter)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded-full text-xs">
+                                        Price: ₱{{ ($minPrice && $minPrice > 0) ? number_format($minPrice, 0) : '0' }} - {{ ($maxPrice && $maxPrice > 0) ? '₱' . number_format($maxPrice, 0) : '∞' }}
                                         <a href="{{ route('listings.index', request()->except('min_price', 'max_price')) }}" class="hover:text-emerald-600">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </a>
@@ -254,33 +269,33 @@
                         @endif
 
                         <!-- Results Header -->
-                        <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
-                                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">
                                     Search Results
                                 </h2>
-                                <p class="text-slate-600 dark:text-slate-400">
-                                    Showing {{ $listings->count() }} of {{ $listings->total() }} listing{{ $listings->total() !== 1 ? 's' : '' }}
+                                <p class="text-sm text-slate-600 dark:text-slate-400">
+                                    {{ $listings->total() }} listing{{ $listings->total() !== 1 ? 's' : '' }} found
                                 </p>
                             </div>
-                            <form method="GET" action="{{ route('listings.index') }}" class="flex gap-3">
+                            <form method="GET" action="{{ route('listings.index') }}" class="flex gap-2">
                                 @foreach(request()->except('sort') as $key => $value)
-                                    @if($value)
+                                    @if($value && trim($value) !== '')
                                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                     @endif
                                 @endforeach
-                                <select name="sort" onchange="this.form.submit()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                    <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                                <select name="sort" onchange="this.form.submit()" class="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
                                     <option value="price-low" {{ request('sort') === 'price-low' ? 'selected' : '' }}>Price: Low to High</option>
                                     <option value="price-high" {{ request('sort') === 'price-high' ? 'selected' : '' }}>Price: High to Low</option>
-                                    <option value="size-large" {{ request('sort') === 'size-large' ? 'selected' : '' }}>Size: Largest First</option>
+                                    <option value="size-large" {{ request('sort') === 'size-large' ? 'selected' : '' }}>Size: Largest</option>
                                 </select>
                             </form>
                         </div>
 
                         <!-- Results Grid -->
                         @if($listings->count() > 0)
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
                                 @foreach($listings as $listing)
                                     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                                         <div class="relative h-48 bg-slate-200 dark:bg-slate-700">
@@ -401,6 +416,7 @@
             }
 
             document.addEventListener('DOMContentLoaded', function() {
+                // Mobile menu toggle
                 const mobileMenuButton = document.getElementById('mobile-menu-button');
                 const mobileMenu = document.getElementById('mobile-menu');
                 const menuIcon = document.getElementById('menu-icon');
@@ -417,6 +433,24 @@
                             mobileMenu.classList.add('hidden');
                             menuIcon.classList.remove('hidden');
                             closeIcon.classList.add('hidden');
+                        }
+                    });
+                }
+
+                // Filter toggle for mobile
+                const filterToggle = document.getElementById('filter-toggle');
+                const filtersSidebar = document.getElementById('filters-sidebar');
+                const filterToggleIcon = document.getElementById('filter-toggle-icon');
+
+                if (filterToggle && filtersSidebar && filterToggleIcon) {
+                    filterToggle.addEventListener('click', function() {
+                        const isHidden = filtersSidebar.classList.contains('hidden');
+                        if (isHidden) {
+                            filtersSidebar.classList.remove('hidden');
+                            filterToggleIcon.style.transform = 'rotate(180deg)';
+                        } else {
+                            filtersSidebar.classList.add('hidden');
+                            filterToggleIcon.style.transform = 'rotate(0deg)';
                         }
                     });
                 }

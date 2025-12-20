@@ -15,9 +15,9 @@ class ListingController extends Controller
     {
         $query = Listing::query();
 
-        // Keyword search (title, location, description)
-        if ($request->filled('search')) {
-            $search = $request->get('search');
+        // Keyword search (title, location, description) - exclude empty/whitespace
+        $search = trim($request->get('search', ''));
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('location', 'like', "%{$search}%")
@@ -25,27 +25,32 @@ class ListingController extends Controller
             });
         }
 
-        // Location filter
-        if ($request->filled('location')) {
-            $query->where('location', 'like', "%{$request->get('location')}%");
+        // Location filter - exclude empty/whitespace
+        $location = trim($request->get('location', ''));
+        if (! empty($location)) {
+            $query->where('location', 'like', "%{$location}%");
         }
 
-        // Price range filter
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->get('min_price'));
+        // Price range filter - exclude empty/zero values
+        $minPrice = $request->get('min_price');
+        if (! empty($minPrice) && $minPrice > 0) {
+            $query->where('price', '>=', $minPrice);
         }
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->get('max_price'));
-        }
-
-        // Category filter
-        if ($request->filled('category')) {
-            $query->where('category', $request->get('category'));
+        $maxPrice = $request->get('max_price');
+        if (! empty($maxPrice) && $maxPrice > 0) {
+            $query->where('price', '<=', $maxPrice);
         }
 
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->get('status'));
+        // Category filter - exclude empty values
+        $category = $request->get('category');
+        if (! empty($category)) {
+            $query->where('category', $category);
+        }
+
+        // Status filter - exclude empty values
+        $status = $request->get('status');
+        if (! empty($status)) {
+            $query->where('status', $status);
         }
 
         // Sort
@@ -70,7 +75,7 @@ class ListingController extends Controller
      */
     public function show(Listing $listing, $slug)
     {
-        $expected = Str::slug($listing->category) . '-'.  Str::slug($listing->title) . '-' . Str::slug($listing->location);
+        $expected = Str::slug($listing->category).'-'.Str::slug($listing->title).'-'.Str::slug($listing->location);
 
         if ($slug !== $expected) {
             return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $expected], 301);
