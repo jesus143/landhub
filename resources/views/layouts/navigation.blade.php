@@ -23,6 +23,17 @@
                     <x-nav-link :href="route('listings.index')" :active="request()->routeIs('listings.*')">
                         {{ __('Browse Listings') }}
                     </x-nav-link>
+                    <div class="relative inline-flex items-center">
+                        <x-nav-link :href="route('messages.inbox')" :active="request()->routeIs('messages.*')">
+                            {{ __('Messages') }}
+                        </x-nav-link>
+                        @php
+                            $unreadCount = Auth::user()->unreadMessagesCount();
+                        @endphp
+                        @if($unreadCount > 0)
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $unreadCount }}</span>
+                        @endif
+                    </div>
                     @if(Auth::check() && Auth::user()->is_admin)
                         <x-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.*')">
                             {{ __('Admin') }}
@@ -52,6 +63,15 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link :href="route('messages.inbox')" class="relative">
+                            {{ __('Messages') }}
+                            @php
+                                $unreadCount = Auth::user()->unreadMessagesCount();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount }}</span>
+                            @endif
+                        </x-dropdown-link>
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -91,6 +111,15 @@
             <x-responsive-nav-link :href="route('listings.index')" :active="request()->routeIs('listings.*')">
                 {{ __('Browse Listings') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('messages.inbox')" :active="request()->routeIs('messages.*')" class="relative">
+                {{ __('Messages') }}
+                @php
+                    $unreadCount = Auth::user()->unreadMessagesCount();
+                @endphp
+                @if($unreadCount > 0)
+                    <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount }}</span>
+                @endif
+            </x-responsive-nav-link>
             @if(Auth::check() && Auth::user()->is_admin)
                 <x-responsive-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.*')">
                     {{ __('Admin') }}
@@ -106,6 +135,15 @@
             </div>
 
             <div class="mt-3 space-y-1 px-2">
+                <x-responsive-nav-link :href="route('messages.inbox')" class="relative">
+                    {{ __('Messages') }}
+                    @php
+                        $unreadCount = Auth::user()->unreadMessagesCount();
+                    @endphp
+                    @if($unreadCount > 0)
+                        <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">{{ $unreadCount }}</span>
+                    @endif
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>

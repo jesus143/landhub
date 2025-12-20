@@ -57,6 +57,20 @@ Route::middleware('auth')->group(function () {
     // Comment update and delete - only comment owner
     Route::put('/comments/{comment}', [\App\Http\Controllers\CommentsController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{comment}', [\App\Http\Controllers\CommentsController::class, 'destroy'])->name('comments.destroy');
+
+    // Messaging routes
+    Route::prefix('messages')->name('messages.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\MessagesController::class, 'index'])->name('inbox');
+        Route::get('/create', [\App\Http\Controllers\MessagesController::class, 'create'])->name('create');
+        Route::get('/create/listing/{listing}', [\App\Http\Controllers\MessagesController::class, 'create'])->name('create.listing');
+        Route::post('/', [\App\Http\Controllers\MessagesController::class, 'store'])->name('store');
+        Route::get('/user/{user}', [\App\Http\Controllers\MessagesController::class, 'show'])->name('show');
+    });
+
+    // Admin messages
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('messages', [\App\Http\Controllers\Admin\AdminMessagesController::class, 'index'])->name('messages.index');
+    });
 });
 
 require __DIR__.'/auth.php';
