@@ -41,13 +41,28 @@
 
                     <!-- Desktop Navigation -->
                     <div class="hidden md:flex items-center gap-4">
-                    @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
+                        @auth
+                            <a
+                                href="{{ url('/dashboard') }}"
                                 class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-                        >
-                            Dashboard
-                        </a>
+                            >
+                                Dashboard
+                            </a>
+                        @else
+                            <a
+                                href="{{ route('login') }}"
+                                class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                            >
+                                Log in
+                            </a>
+                            @if (Route::has('register'))
+                                <a
+                                    href="{{ route('register') }}"
+                                    class="px-6 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm"
+                                >
+                                    Sign Up
+                                </a>
+                            @endif
                         @endauth
                     </div>
 
@@ -77,7 +92,22 @@
                             >
                                 Dashboard
                             </a>
-                    @endauth
+                        @else
+                            <a
+                                href="{{ route('login') }}"
+                                class="px-4 py-2 text-base font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                            >
+                                Log in
+                            </a>
+                            @if (Route::has('register'))
+                                <a
+                                    href="{{ route('register') }}"
+                                    class="px-4 py-2 text-base font-medium bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm text-center"
+                                >
+                                    Sign Up
+                                </a>
+                            @endif
+                        @endauth
                     </div>
                 </div>
                 </nav>
@@ -294,11 +324,11 @@
                     @if (Route::has('register'))
                         <a
                             href="{{ route('register') }}"
-                            class="hidden px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-lg border-2 border-white/20"
+                            class="px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-lg border-2 border-white/20"
                         >
                             Create Free Account
                         </a>
-        @endif
+                    @endif
                 </div>
             </div>
         </section>

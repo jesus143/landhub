@@ -1,4 +1,7 @@
+
+
 <x-guest-layout>
+
     <!-- Header -->
     <div class="mb-8 text-center">
         <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Create Account</h2>
