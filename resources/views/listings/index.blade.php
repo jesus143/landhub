@@ -124,6 +124,11 @@
                                     </div>
                                 </div>
 
+                                <!-- Hidden field to preserve status if not explicitly set -->
+                                @if(!request()->has('status'))
+                                    <input type="hidden" name="status" value="for_sale">
+                                @endif
+
                                 <!-- Compact Filters -->
                                 <div class="space-y-3">
                                     <!-- Location Searchable Dropdown -->
@@ -224,14 +229,34 @@
                                             <option value="commercial" {{ request('category') === 'commercial' ? 'selected' : '' }}>Commercial</option>
                                         </select>
                                     </div>
+
+                                    <!-- Status -->
+                                    <div>
+                                        <label for="status" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                                        <select
+                                            id="status"
+                                            name="status"
+                                            class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                        >
+                                            <option value="for_sale" {{ (request('status', 'for_sale') === 'for_sale') ? 'selected' : '' }}>For Sale</option>
+                                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="sold" {{ request('status') === 'sold' ? 'selected' : '' }}>Sold</option>
+                                            <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>All Status</option>
+                                        </select>
+                                    </div>
                                 </div>
+
+                                <!-- Preserve status default if not explicitly changed -->
+                                @if(!request()->has('status'))
+                                    <input type="hidden" name="status" value="for_sale">
+                                @endif
 
                                 <!-- Compact Action Buttons -->
                                 <div class="mt-4 flex gap-2">
                                     <button type="submit" class="flex-1 px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
                                         Apply
                                     </button>
-                                    <a href="{{ route('listings.index') }}" class="px-4 py-2 text-sm border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium rounded-lg transition-colors">
+                                    <a href="{{ route('listings.index', ['status' => 'for_sale']) }}" class="px-4 py-2 text-sm border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium rounded-lg transition-colors">
                                         Clear
                                     </a>
                                 </div>
@@ -243,9 +268,11 @@
                     <main class="flex-1 min-w-0">
                         <!-- Active Filters -->
                         @php
+                            $currentStatus = request('status', 'for_sale');
                             $hasActiveFilters = (trim(request('search', '')) !== '') ||
                                                 (trim(request('location', '')) !== '') ||
                                                 (request('category', '') !== '') ||
+                                                ($currentStatus !== 'for_sale' && $currentStatus !== 'all') ||
                                                 (request('min_price', '') !== '' && request('min_price') > 0) ||
                                                 (request('max_price', '') !== '' && request('max_price') > 0);
                         @endphp
@@ -316,6 +343,10 @@
                                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                     @endif
                                 @endforeach
+                                @php
+                                    $currentStatus = request('status', 'for_sale');
+                                @endphp
+                                <input type="hidden" name="status" value="{{ $currentStatus }}">
                                 <select name="sort" onchange="this.form.submit()" class="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                                     <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest</option>
                                     <option value="price-low" {{ request('sort') === 'price-low' ? 'selected' : '' }}>Price: Low to High</option>

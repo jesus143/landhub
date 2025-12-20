@@ -47,9 +47,9 @@ class ListingController extends Controller
             $query->where('category', $category);
         }
 
-        // Status filter - exclude empty values
-        $status = $request->get('status');
-        if (! empty($status)) {
+        // Status filter - default to 'for_sale' if not specified, but allow 'all' to show everything
+        $status = $request->get('status', 'for_sale');
+        if (! empty($status) && $status !== 'all') {
             $query->where('status', $status);
         }
 
