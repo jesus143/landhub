@@ -11,18 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('listing_id')->constrained()->onDelete('cascade');
-            $table->text('content');
-            $table->boolean('is_approved')->default(false);
-            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
-            $table->timestamps();
-
-            $table->index(['listing_id', 'is_approved']);
-            $table->index(['user_id']);
-        });
+        // This migration was replaced by 2025_12_19_120000_create_comments_table.php
+        // To keep historical ordering but avoid duplicate table creation, do nothing here if table exists.
+        if (! Schema::hasTable('comments')) {
+            Schema::create('comments', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('listing_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+                $table->string('guest_name')->nullable();
+                $table->string('guest_email')->nullable();
+                $table->text('body');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

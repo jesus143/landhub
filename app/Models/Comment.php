@@ -12,7 +12,17 @@ class Comment extends Model
         'guest_name',
         'guest_email',
         'body',
+        'approved',
+        'agree_count',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'approved' => 'boolean',
+            'agree_count' => 'integer',
+        ];
+    }
 
     public function listing()
     {
@@ -22,5 +32,16 @@ class Comment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(CommentLike::class);
+    }
+
+    public function isLikedBy($user)
+    {
+        if (! $user) return false;
+        return $this->likes()->where('user_id', $user->id)->exists();
     }
 }

@@ -248,6 +248,20 @@
                                 {{ number_format($listing->area, 0) }} sqm
                             </div>
 
+                            @if(!empty($listing->price_history) && is_array($listing->price_history))
+                                <div class="mb-6">
+                                    <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Price History</h3>
+                                    <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                                        @foreach($listing->price_history as $ph)
+                                            <li class="flex items-center justify-between">
+                                                <span>{{ \Illuminate\Support\Carbon::parse($ph['date'])->format('Y-m-d') }}</span>
+                                                <span class="font-medium">₱{{ number_format($ph['price'], 0) }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             @if($listing->description)
                                 <div class="mb-6">
                                     <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Description</h3>
@@ -429,24 +443,35 @@
                                                     </span>
                                                 </div>
                                                 <div class="flex-1">
-                                                    <div class="flex items-center space-x-2 mb-1">
-                                                        <span class="font-medium text-slate-900 dark:text-white">
-                                                            {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
-                                                        </span>
-                                                        <span class="text-sm text-slate-500 dark:text-slate-400">
-                                                            {{ $comment->created_at->diffForHumans() }}
-                                                        </span>
-                                                    </div>
-                                                    <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">
-                                                        {{ $comment->body }}
-                                                    </p>
+                                                                        <div class="flex items-center justify-between mb-1">
+                                                                            <div class="flex items-center gap-2">
+                                                                                <span class="font-medium text-slate-900 dark:text-white">
+                                                                                    {{ optional($comment->user)->name ?? $comment->guest_name ?? 'Guest' }}
+                                                                                </span>
+                                                                                <span class="text-sm text-slate-500 dark:text-slate-400" title="{{ $comment->created_at->format('Y-m-d H:i:s') }}">
+                                                                                    {{ $comment->created_at->diffForHumans() }} · {{ $comment->created_at->format('Y-m-d H:i') }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="flex items-center gap-3">
+                                                                                <button onclick="handleAgree({{ $comment->id }})" class="agree-btn flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600">
+                                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l-3 6h4l3-6h-4zM5 13h4l3-6H8L5 13z"/></svg>
+                                                                                    <span class="agree-count" data-agree="{{ $comment->agree_count ?? 0 }}">{{ $comment->agree_count ?? 0 }}</span>
+                                                                                    @if(auth()->check())
+                                                                                        <input type="hidden" class="agree-user-liked" value="{{ $comment->isLikedBy(auth()->user()) ? 1 : 0 }}">
+                                                                                    @endif
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">
+                                                                            {{ $comment->body }}
+                                                                        </p>
                                                 </div>
                                             </div>
 
-                                            @if(auth()->check() && auth()->id() === $comment->user_id)
-                                                <div class="flex space-x-2 ml-4">
+                                            <div class="flex items-center space-x-2 ml-4">
+                                                @if(auth()->check() && auth()->id() === $comment->user_id)
                                                     <button
-                                                        onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->content) }}')"
+                                                        onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->content ?? $comment->body) }}')"
                                                         class="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                                                     >
                                                         Edit
@@ -457,8 +482,23 @@
                                                     >
                                                         Delete
                                                     </button>
-                                                </div>
-                                            @endif
+                                                @endif
+
+                                                @if(auth()->check() && auth()->user()->is_admin)
+                                                    <button
+                                                        onclick="approveComment({{ $comment->id }})"
+                                                        class="text-sm px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded-full text-slate-700 dark:text-slate-200 hover:bg-emerald-50 hover:text-emerald-700"
+                                                        data-approved="{{ $comment->approved ? '1' : '0' }}"
+                                                        id="approve-btn-{{ $comment->id }}"
+                                                    >
+                                                        @if($comment->approved)
+                                                            ✓ Approved
+                                                        @else
+                                                            ○ Approve
+                                                        @endif
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -553,6 +593,8 @@
 
         <script>
             const mediaItems = @json($allMedia);
+            const listingId = {{ $listing->id }};
+            const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
             let currentMediaIndex = 0;
             let lightboxOpen = false;
 
@@ -724,52 +766,7 @@
                 }
             });
 
-            // Comment functionality
-            document.getElementById('comment-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const form = this;
-                const submitBtn = document.getElementById('submit-comment');
-                const submitText = document.getElementById('submit-text');
-                const loadingText = document.getElementById('loading-text');
-
-                // Show loading state
-                submitBtn.disabled = true;
-                submitText.classList.add('hidden');
-                loadingText.classList.remove('hidden');
-
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Clear form
-                        form.reset();
-                        // Reload comments section
-                        location.reload();
-                    } else {
-                        alert('Error posting comment. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error posting comment. Please try again.');
-                })
-                .finally(() => {
-                    // Reset loading state
-                    submitBtn.disabled = false;
-                    submitText.classList.remove('hidden');
-                    loadingText.classList.add('hidden');
-                });
-            });
+            // (Comment submission handled by single AJAX handler lower in the file.)
 
             // Edit comment functions
             function editComment(commentId, content) {
@@ -885,18 +882,29 @@
                             const container = document.createElement('div');
                             container.className = 'border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-slate-50 dark:bg-slate-700/50 mb-4';
                             const author = data.comment.user ? (data.comment.user.name) : (data.comment.guest_name || 'Guest');
-                            const time = 'just now';
+                            const time = `${formatDateTime(new Date())}`;
+                            const relative = 'just now';
                             const body = data.comment.body;
+                            const commentId = data.comment.id || Math.floor(Math.random() * 1000000);
+                            const userLiked = isAuthenticated ? (data.comment.user && data.comment.user.id === {{ auth()->id() ?? 'null' }}) : false;
                             container.innerHTML = `
-                                <div class="flex items-start justify-between">
-                                    <div class="flex items-start space-x-3">
-                                        <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
+                                <div class="flex items-start justify-between" data-comment-id="${commentId}">
+                                    <div class="flex items-start space-x-3 w-full">
+                                        <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
                                             <span class="text-white font-medium text-sm">${(author || 'G').charAt(0).toUpperCase()}</span>
                                         </div>
                                         <div class="flex-1">
-                                            <div class="flex items-center space-x-2 mb-1">
-                                                <span class="font-medium text-slate-900 dark:text-white">${author}</span>
-                                                <span class="text-sm text-slate-500 dark:text-slate-400">${time}</span>
+                                            <div class="flex items-center justify-between mb-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-medium text-slate-900 dark:text-white">${author}</span>
+                                                    <span class="text-sm text-slate-500 dark:text-slate-400">${relative} · ${time}</span>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <button onclick="handleAgree(${commentId})" class="agree-btn flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600">
+                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l-3 6h4l3-6h-4zM5 13h4l3-6H8L5 13z"/></svg>
+                                                        <span class="agree-count" data-agree="0">0</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap comment-content">${body}</p>
                                         </div>
@@ -910,6 +918,14 @@
 
                             // Prepend
                             commentsSection.prepend(container);
+
+                            // initialize agree state for new item
+                            initAgreeFor(commentId);
+                            // if authenticated and server returned comment, set server like state if any
+                            if (isAuthenticated && data.comment.id) {
+                                // fetch liked state via DOM marker (server didn't return liked in store)
+                                // no-op: newly created comment cannot be liked yet by this user
+                            }
 
                             // clear textarea
                             document.getElementById('body').value = '';
@@ -928,8 +944,161 @@
                     });
                 });
             }
+
+            // Helper: format Date to Y-m-d H:i
+            function formatDateTime(d) {
+                const pad = (n) => n.toString().padStart(2, '0');
+                const Y = d.getFullYear();
+                const M = pad(d.getMonth() + 1);
+                const D = pad(d.getDate());
+                const h = pad(d.getHours());
+                const m = pad(d.getMinutes());
+                return `${Y}-${M}-${D} ${h}:${m}`;
+            }
+
+            // Agree button handling: server-backed for authenticated users, localStorage fallback for guests
+            function handleAgree(commentId) {
+                const el = document.querySelector(`[data-comment-id="${commentId}"] .agree-count`);
+                if (!el) return;
+
+                const btn = el.closest('.agree-btn');
+
+                if (isAuthenticated) {
+                    // call server to toggle like
+                    fetch(`/comments/${commentId}/agree`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert(data.message || 'Failed to update like');
+                            return;
+                        }
+                        // update count and UI
+                        el.textContent = data.agree_count ?? el.textContent;
+                        if (data.liked) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Error updating like');
+                    });
+                } else {
+                    // guest: fallback to localStorage
+                    const countKey = `agree_count_${listingId}_${commentId}`;
+                    const stateKey = `agree_state_${listingId}_${commentId}`;
+                    const currentCount = parseInt(localStorage.getItem(countKey) ?? el.getAttribute('data-agree') ?? '0', 10);
+                    const currentState = localStorage.getItem(stateKey) === '1';
+
+                    let newCount = currentCount;
+                    let newState = !currentState;
+                    if (newState) newCount = currentCount + 1; else newCount = Math.max(0, currentCount - 1);
+
+                    localStorage.setItem(countKey, String(newCount));
+                    localStorage.setItem(stateKey, newState ? '1' : '0');
+
+                    el.textContent = newCount;
+                    if (newState) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                }
+            }
+
+            function initAgreeFor(commentId) {
+                const countKey = `agree_count_${listingId}_${commentId}`;
+                const stateKey = `agree_state_${listingId}_${commentId}`;
+                const el = document.querySelector(`[data-comment-id="${commentId}"] .agree-count`);
+                if (!el) return;
+                const btn = el.closest('.agree-btn');
+                // If authenticated, prefer server-provided liked state embedded in DOM
+                if (isAuthenticated) {
+                    const likedInput = el.closest('[data-comment-id]').querySelector('.agree-user-liked');
+                    if (likedInput) {
+                        const liked = likedInput.value === '1';
+                        if (liked) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                    }
+                    // set count from data attribute unless overridden by localStorage
+                    const savedCount = localStorage.getItem(countKey);
+                    if (savedCount !== null) {
+                        el.textContent = savedCount;
+                    } else {
+                        el.textContent = el.getAttribute('data-agree') ?? '0';
+                    }
+                } else {
+                    const savedCount = localStorage.getItem(countKey);
+                    const savedState = localStorage.getItem(stateKey) === '1';
+                    if (savedCount !== null) {
+                        el.textContent = savedCount;
+                    }
+                    if (btn) {
+                        if (savedState) btn.classList.add('text-emerald-600'); else btn.classList.remove('text-emerald-600');
+                    }
+                }
+            }
+
+            function initAgreeState() {
+                document.querySelectorAll('.agree-count').forEach(el => {
+                    const wrapper = el.closest('[data-comment-id]');
+                    if (!wrapper) return;
+                    const commentId = wrapper.getAttribute('data-comment-id');
+                    // default from markup
+                    const defaultCount = el.getAttribute('data-agree') ?? '0';
+                    const countKey = `agree_count_${listingId}_${commentId}`;
+                    if (localStorage.getItem(countKey) === null) {
+                        localStorage.setItem(countKey, defaultCount);
+                    }
+                    initAgreeFor(commentId);
+                });
+            }
+
+            // Initialize agree state on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                initAgreeState();
+                // Initialize approve button states for admins
+                document.querySelectorAll('[id^="approve-btn-"]').forEach(btn => {
+                    const approved = btn.getAttribute('data-approved') === '1';
+                    if (approved) btn.classList.add('bg-emerald-100', 'text-emerald-700');
+                });
+            });
+
+            // Approve comment (admin)
+            function approveComment(commentId) {
+                if (!confirm('Toggle approve for this comment?')) return;
+                fetch(`/comments/${commentId}/approve`, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.message || 'Failed to update approval');
+                        return;
+                    }
+                    const btn = document.getElementById(`approve-btn-${commentId}`);
+                    if (!btn) return;
+                    if (data.approved) {
+                        btn.innerText = '✓ Approved';
+                        btn.classList.add('bg-emerald-100', 'text-emerald-700');
+                    } else {
+                        btn.innerText = '○ Approve';
+                        btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error updating approval');
+                });
+            }
+
         </script>
     </body>
 </html>
+
 
 

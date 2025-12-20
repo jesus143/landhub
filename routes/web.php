@@ -34,6 +34,11 @@ Route::middleware('auth')->group(function () {
         Route::put('listings/{listing}', [\App\Http\Controllers\AdminListingController::class, 'update'])->name('listings.update');
         Route::patch('listings/{listing}/status', [\App\Http\Controllers\AdminListingController::class, 'updateStatus'])->name('listings.updateStatus');
     });
+
+    // Comment moderation (approve) - admin only check performed in controller
+    Route::patch('/comments/{comment}/approve', [\App\Http\Controllers\CommentsController::class, 'approve'])->name('comments.approve');
+    // Comment like/agree (toggle) - authenticated users
+    Route::post('/comments/{comment}/agree', [\App\Http\Controllers\CommentsController::class, 'agree'])->name('comments.agree');
 });
 
 require __DIR__.'/auth.php';
