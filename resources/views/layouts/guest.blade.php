@@ -22,7 +22,7 @@
         </style>
     </head>
     <body class="font-sans antialiased bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-100">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 px-4">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-8 sm:pt-0 pb-8 px-4">
             <!-- Logo and Brand -->
             <div class="mb-8">
                 <a href="{{ route('welcome') }}" class="flex items-center gap-3">
@@ -39,7 +39,7 @@
             </div>
 
             <!-- Auth Card -->
-            <div class="w-full sm:max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div class="w-full sm:max-w-2xl bg-white dark:bg-slate-800 shadow-2xl rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
                 <div class="px-8 py-10">
                     {{ $slot }}
                 </div>
