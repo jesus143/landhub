@@ -44,8 +44,13 @@
 
                     @if(Auth::check() && Auth::user()->is_admin)
                         <div class="relative inline-flex items-center">
-                            <x-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.*')">
+                            <x-nav-link :href="route('admin.listings.index')" :active="request()->routeIs('admin.listings*')">
                             {{ __('Admin') }}
+                            </x-nav-link>
+                        </div>
+                        <div class="relative inline-flex items-center">
+                            <x-nav-link :href="route('admin.comments.index')" :active="request()->routeIs('admin.comments.*')">
+                            {{ __('Comments') }}
                             </x-nav-link>
                         </div>
                     @endif

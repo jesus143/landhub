@@ -62,8 +62,8 @@ class Listing extends Model
         return $this->hasMany(\App\Models\Comment::class);
     }
 
-
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'email');
     }
 }

@@ -16,7 +16,7 @@ Route::post('/lands/{listing}-{slug}/comments', [\App\Http\Controllers\CommentsC
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
-    
+
     if ($user->is_admin) {
         // Admin statistics
         $stats = [
@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
     // Admin messages
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('messages', [\App\Http\Controllers\Admin\AdminMessagesController::class, 'index'])->name('messages.index');
+        Route::get('comments', [\App\Http\Controllers\Admin\AdminCommentsController::class, 'index'])->name('comments.index');
     });
 });
 
