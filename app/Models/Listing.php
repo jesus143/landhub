@@ -24,6 +24,20 @@ class Listing extends Model
         'contact_phone',
         'contact_email',
         'contact_fb_link',
+        'is_titled',
+        'trees_plants',
+        'terrain_type',
+        'vehicle_accessible',
+        'additional_features',
+        'property_type',
+        'frontage',
+        'road_type',
+        'num_rooms',
+        'is_fenced',
+        'is_beachfront',
+        'beach_frontage',
+        'title_status',
+        'payment_terms',
     ];
 
     protected function casts(): array
@@ -34,6 +48,12 @@ class Listing extends Model
             'latitude' => 'decimal:8',
             'longitude' => 'decimal:8',
             'media' => 'array',
+            'is_titled' => 'boolean',
+            'vehicle_accessible' => 'boolean',
+            'frontage' => 'decimal:2',
+            'beach_frontage' => 'decimal:2',
+            'is_fenced' => 'boolean',
+            'is_beachfront' => 'boolean',
         ];
     }
 
@@ -53,6 +73,20 @@ class Listing extends Model
         }
 
         return $media;
+    }
+
+    /**
+     * Check if featured video is a YouTube URL.
+     */
+    public function isFeaturedVideoYouTube(): bool
+    {
+        if (! $this->featured_video_url) {
+            return false;
+        }
+
+        $url = $this->featured_video_url;
+
+        return str_contains($url, 'youtube.com') || str_contains($url, 'youtu.be');
     }
 
     /**

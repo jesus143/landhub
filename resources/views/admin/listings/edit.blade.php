@@ -157,10 +157,144 @@
             <input type="url" name="map_link" value="{{ old('map_link', $listing->map_link) }}" class="w-full border p-2">
         </div>
 
+        <div class="mb-4 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg border">
+            <h3 class="text-lg font-semibold mb-4">Property Details</h3>
+
+            <div class="mb-2">
+                <label class="flex items-center gap-2">
+                    <input type="checkbox" name="is_titled" value="1" {{ old('is_titled', $listing->is_titled) ? 'checked' : '' }} class="border p-2">
+                    <span>Titled Property</span>
+                </label>
+            </div>
+
+            <div class="mb-2">
+                <label class="block">Trees & Plants on Property</label>
+                <textarea name="trees_plants" rows="4" class="w-full border p-2" placeholder="e.g., 70 ka punuan sa Lubi, Hardwoods, Saging, Star Apple, Kawayan">{{ old('trees_plants', $listing->trees_plants) }}</textarea>
+                <p class="text-sm text-gray-600 mt-1">List all trees, plants, and crops on the property</p>
+            </div>
+
+            <div class="mb-2">
+                <label class="block">Terrain Type</label>
+                <input type="text" name="terrain_type" value="{{ old('terrain_type', $listing->terrain_type) }}" class="w-full border p-2" placeholder="e.g., FLAT to Rolling, Hilly, Mountainous">
+                <p class="text-sm text-gray-600 mt-1">Describe the terrain/landscape</p>
+            </div>
+
+            <div class="mb-2">
+                <label class="flex items-center gap-2">
+                    <input type="checkbox" name="vehicle_accessible" value="1" {{ old('vehicle_accessible', $listing->vehicle_accessible) ? 'checked' : '' }} class="border p-2">
+                    <span>Vehicle Accessible</span>
+                </label>
+                <p class="text-sm text-gray-600 mt-1">Whether vehicles can access the property (Sulod sakyanan)</p>
+            </div>
+
+            <div class="mb-2">
+                <label class="block">Additional Features & Amenities</label>
+                <textarea name="additional_features" rows="3" class="w-full border p-2" placeholder="e.g., Overlooking view, Source of Sand and Gravel, Water source, Electricity, etc.">{{ old('additional_features', $listing->additional_features) }}</textarea>
+                <p class="text-sm text-gray-600 mt-1">List any additional features, amenities, or special characteristics</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-4">
+                <div class="mb-2">
+                    <label class="block">Property Type</label>
+                    <select name="property_type" class="w-full border p-2">
+                        <option value="">Select...</option>
+                        <option value="LOT" {{ old('property_type', $listing->property_type) === 'LOT' ? 'selected' : '' }}>LOT</option>
+                        <option value="HOUSE" {{ old('property_type', $listing->property_type) === 'HOUSE' ? 'selected' : '' }}>HOUSE</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="block">Title Status</label>
+                    <input type="text" name="title_status" value="{{ old('title_status', $listing->title_status) }}" class="w-full border p-2" placeholder="e.g., Clean Title, Solo title">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="mb-2">
+                    <label class="block">Frontage (meters)</label>
+                    <input type="number" step="0.01" name="frontage" value="{{ old('frontage', $listing->frontage) }}" class="w-full border p-2" placeholder="e.g., 20">
+                </div>
+
+                <div class="mb-2">
+                    <label class="block">Road Type</label>
+                    <input type="text" name="road_type" value="{{ old('road_type', $listing->road_type) }}" class="w-full border p-2" placeholder="e.g., Cemented, Dirt, Gravel">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="mb-2">
+                    <label class="block">Number of Rooms</label>
+                    <input type="number" name="num_rooms" value="{{ old('num_rooms', $listing->num_rooms) }}" class="w-full border p-2" placeholder="For houses only" min="0">
+                </div>
+
+                <div class="mb-2">
+                    <label class="block">Beach Frontage (meters)</label>
+                    <input type="number" step="0.01" name="beach_frontage" value="{{ old('beach_frontage', $listing->beach_frontage) }}" class="w-full border p-2" placeholder="e.g., 100">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="mb-2">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="is_fenced" value="1" {{ old('is_fenced', $listing->is_fenced) ? 'checked' : '' }} class="border p-2">
+                        <span>Fenced</span>
+                    </label>
+                </div>
+
+                <div class="mb-2">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="is_beachfront" value="1" {{ old('is_beachfront', $listing->is_beachfront) ? 'checked' : '' }} class="border p-2">
+                        <span>Beachfront</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="block">Payment Terms</label>
+                <textarea name="payment_terms" rows="2" class="w-full border p-2" placeholder="e.g., Cash basis, pwede 2 gives, Installment available">{{ old('payment_terms', $listing->payment_terms) }}</textarea>
+            </div>
+        </div>
+
+        @if($listing->featured_video_url)
+            <div class="mb-2">
+                <label class="block mb-2">Current Featured Video</label>
+                <div class="relative inline-block group">
+                    @if(str_contains($listing->featured_video_url, 'youtube.com') || str_contains($listing->featured_video_url, 'youtu.be'))
+                        <div class="w-full max-w-md">
+                            <iframe width="100%" height="200" src="{{ $listing->getFeaturedVideoEmbedUrl() }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="rounded"></iframe>
+                        </div>
+                    @else
+                        <div class="w-full max-w-md">
+                            <video src="{{ $listing->featured_video_url }}" controls class="w-full rounded" style="max-height: 200px;"></video>
+                        </div>
+                    @endif
+                    <button
+                        type="button"
+                        onclick="deleteFeaturedVideo({{ $listing->id }})"
+                        class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                        title="Delete featured video"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        @endif
+
         <div class="mb-2">
-            <label class="block">Featured Video (YouTube URL)</label>
+            <label class="block">Featured Video (Upload)</label>
+            <input type="file" name="featured_video" accept="video/*" class="w-full border p-2 {{ $errors->has('featured_video') ? 'border-red-500' : '' }}">
+            @error('featured_video')
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+            @enderror
+            <p class="text-sm text-gray-600 mt-1">Or provide a video URL below (YouTube or direct link). Max file size: 100MB. Supported formats: MP4, WebM, OGG, MOV, AVI, MKV</p>
+        </div>
+
+        <div class="mb-2">
+            <label class="block">Featured Video URL</label>
             <input type="url" name="featured_video_url" value="{{ old('featured_video_url', $listing->featured_video_url) }}" class="w-full border p-2" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/...">
-            <p class="text-sm text-gray-600 mt-1">Enter a YouTube video URL (full URL or short URL)</p>
+            <p class="text-sm text-gray-600 mt-1">Enter a YouTube video URL (full URL or short URL) or any direct video link. Leave empty if uploading a video above.</p>
         </div>
 
         <div class="grid grid-cols-3 gap-4">
@@ -247,6 +381,37 @@
         .catch(error => {
             console.error('Error:', error);
             alert('Error deleting main image. Please try again.');
+        });
+    }
+
+    function deleteFeaturedVideo(listingId) {
+        if (!confirm('Are you sure you want to delete the featured video? This action cannot be undone.')) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                         document.querySelector('input[name="_token"]')?.value;
+
+        fetch(`/admin/listings/${listingId}/featured-video`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to refresh the featured video display
+                window.location.reload();
+            } else {
+                alert(data.error || 'Error deleting featured video. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting featured video. Please try again.');
         });
     }
 </script>

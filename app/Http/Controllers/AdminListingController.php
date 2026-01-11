@@ -37,7 +37,32 @@ class AdminListingController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        // Check if file upload failed at PHP level
+        if ($request->hasFile('featured_video')) {
+            $file = $request->file('featured_video');
+            if (! $file->isValid()) {
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'File exceeds PHP upload_max_filesize limit.',
+                    UPLOAD_ERR_FORM_SIZE => 'File exceeds form MAX_FILE_SIZE limit.',
+                    UPLOAD_ERR_PARTIAL => 'File was only partially uploaded.',
+                    UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder.',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                    UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+                ];
+                $errorCode = $file->getError();
+                $errorMsg = $errorMessages[$errorCode] ?? 'Unknown upload error (code: '.$errorCode.')';
+                \Log::error('PHP upload error', [
+                    'error_code' => $errorCode,
+                    'error_message' => $errorMsg,
+                    'file_name' => $file->getClientOriginalName(),
+                ]);
+
+                return back()->withErrors(['featured_video' => 'Upload failed: '.$errorMsg])->withInput();
+            }
+        }
+
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
@@ -55,10 +80,44 @@ class AdminListingController extends Controller
             'nearby_landmarks' => 'nullable|string',
             'map_link' => 'nullable|url',
             'featured_video_url' => 'nullable|url',
+            'is_titled' => 'nullable|boolean',
+            'trees_plants' => 'nullable|string',
+            'terrain_type' => 'nullable|string|max:255',
+            'vehicle_accessible' => 'nullable|boolean',
+            'additional_features' => 'nullable|string',
+            'property_type' => 'nullable|string|max:50',
+            'frontage' => 'nullable|numeric|min:0',
+            'road_type' => 'nullable|string|max:100',
+            'num_rooms' => 'nullable|integer|min:0',
+            'is_fenced' => 'nullable|boolean',
+            'is_beachfront' => 'nullable|boolean',
+            'beach_frontage' => 'nullable|numeric|min:0',
+            'title_status' => 'nullable|string|max:100',
+            'payment_terms' => 'nullable|string',
             'contact_phone' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email',
             'contact_fb_link' => 'nullable|url',
-        ]);
+        ];
+
+        $messages = [
+            'featured_video.file' => 'The featured video must be a valid file.',
+            'featured_video.max' => 'The featured video file size must not exceed 100MB. Your file is too large.',
+        ];
+
+        try {
+            $data = $request->validate($rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'file_info' => $request->hasFile('featured_video') ? [
+                    'name' => $request->file('featured_video')->getClientOriginalName(),
+                    'size' => $request->file('featured_video')->getSize(),
+                    'mime' => $request->file('featured_video')->getMimeType(),
+                    'extension' => $request->file('featured_video')->getClientOriginalExtension(),
+                ] : 'No file uploaded',
+            ]);
+            throw $e;
+        }
 
         // Handle main image upload
         if ($request->hasFile('main_image')) {
@@ -88,6 +147,52 @@ class AdminListingController extends Controller
         }
         $data['media'] = ! empty($mediaItems) ? $mediaItems : null;
 
+        // Handle featured video upload
+        if ($request->hasFile('featured_video')) {
+            try {
+                $file = $request->file('featured_video');
+
+                // Check for upload errors
+                if (! $file->isValid()) {
+                    $errorMsg = $file->getErrorMessage();
+                    \Log::error('Video upload failed', [
+                        'error' => $errorMsg,
+                        'error_code' => $file->getError(),
+                        'file_name' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                    ]);
+
+                    return back()->withErrors(['featured_video' => 'Video upload failed: '.$errorMsg])->withInput();
+                }
+
+                // Validate file size (100MB = 102400 KB = 104857600 bytes)
+                $maxSize = 104857600; // 100MB in bytes
+                if ($file->getSize() > $maxSize) {
+                    $fileSizeMB = round($file->getSize() / 1048576, 2);
+
+                    return back()->withErrors(['featured_video' => "File size ({$fileSizeMB}MB) exceeds the maximum allowed size of 100MB."])->withInput();
+                }
+
+                // Validate file extension manually
+                $allowedExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                $extension = strtolower($file->getClientOriginalExtension());
+
+                if (! in_array($extension, $allowedExtensions)) {
+                    return back()->withErrors(['featured_video' => 'Invalid video format. Allowed formats: '.implode(', ', $allowedExtensions)])->withInput();
+                }
+
+                $path = $file->store('listings/videos', 'public');
+                $data['featured_video_url'] = Storage::disk('public')->url($path);
+            } catch (\Exception $e) {
+                \Log::error('Video upload exception', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return back()->withErrors(['featured_video' => 'Video upload failed: '.$e->getMessage()])->withInput();
+            }
+        }
+
         Listing::create($data);
 
         return redirect()->route('admin.listings.index')->with('success', 'Listing created');
@@ -100,7 +205,32 @@ class AdminListingController extends Controller
 
     public function update(Request $request, Listing $listing)
     {
-        $data = $request->validate([
+        // Check if file upload failed at PHP level
+        if ($request->hasFile('featured_video')) {
+            $file = $request->file('featured_video');
+            if (! $file->isValid()) {
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'File exceeds PHP upload_max_filesize limit.',
+                    UPLOAD_ERR_FORM_SIZE => 'File exceeds form MAX_FILE_SIZE limit.',
+                    UPLOAD_ERR_PARTIAL => 'File was only partially uploaded.',
+                    UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder.',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                    UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+                ];
+                $errorCode = $file->getError();
+                $errorMsg = $errorMessages[$errorCode] ?? 'Unknown upload error (code: '.$errorCode.')';
+                \Log::error('PHP upload error', [
+                    'error_code' => $errorCode,
+                    'error_message' => $errorMsg,
+                    'file_name' => $file->getClientOriginalName(),
+                ]);
+
+                return back()->withErrors(['featured_video' => 'Upload failed: '.$errorMsg])->withInput();
+            }
+        }
+
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
@@ -118,10 +248,44 @@ class AdminListingController extends Controller
             'nearby_landmarks' => 'nullable|string',
             'map_link' => 'nullable|url',
             'featured_video_url' => 'nullable|url',
+            'is_titled' => 'nullable|boolean',
+            'trees_plants' => 'nullable|string',
+            'terrain_type' => 'nullable|string|max:255',
+            'vehicle_accessible' => 'nullable|boolean',
+            'additional_features' => 'nullable|string',
+            'property_type' => 'nullable|string|max:50',
+            'frontage' => 'nullable|numeric|min:0',
+            'road_type' => 'nullable|string|max:100',
+            'num_rooms' => 'nullable|integer|min:0',
+            'is_fenced' => 'nullable|boolean',
+            'is_beachfront' => 'nullable|boolean',
+            'beach_frontage' => 'nullable|numeric|min:0',
+            'title_status' => 'nullable|string|max:100',
+            'payment_terms' => 'nullable|string',
             'contact_phone' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email',
             'contact_fb_link' => 'nullable|url',
-        ]);
+        ];
+
+        $messages = [
+            'featured_video.file' => 'The featured video must be a valid file.',
+            'featured_video.max' => 'The featured video file size must not exceed 100MB. Your file is too large.',
+        ];
+
+        try {
+            $data = $request->validate($rules, $messages);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'file_info' => $request->hasFile('featured_video') ? [
+                    'name' => $request->file('featured_video')->getClientOriginalName(),
+                    'size' => $request->file('featured_video')->getSize(),
+                    'mime' => $request->file('featured_video')->getMimeType(),
+                    'extension' => $request->file('featured_video')->getClientOriginalExtension(),
+                ] : 'No file uploaded',
+            ]);
+            throw $e;
+        }
 
         // Handle main image upload
         if ($request->hasFile('main_image')) {
@@ -154,6 +318,58 @@ class AdminListingController extends Controller
             $mediaItems = array_merge($existingMedia, $uploadedMedia);
         }
         $data['media'] = ! empty($mediaItems) ? $mediaItems : ($listing->media ?? null);
+
+        // Handle featured video upload
+        if ($request->hasFile('featured_video')) {
+            try {
+                $file = $request->file('featured_video');
+
+                // Check for upload errors
+                if (! $file->isValid()) {
+                    $errorMsg = $file->getErrorMessage();
+                    \Log::error('Video upload failed', [
+                        'error' => $errorMsg,
+                        'error_code' => $file->getError(),
+                        'file_name' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                    ]);
+
+                    return back()->withErrors(['featured_video' => 'Video upload failed: '.$errorMsg])->withInput();
+                }
+
+                // Validate file size (100MB = 102400 KB = 104857600 bytes)
+                $maxSize = 104857600; // 100MB in bytes
+                if ($file->getSize() > $maxSize) {
+                    $fileSizeMB = round($file->getSize() / 1048576, 2);
+
+                    return back()->withErrors(['featured_video' => "File size ({$fileSizeMB}MB) exceeds the maximum allowed size of 100MB."])->withInput();
+                }
+
+                // Validate file extension manually
+                $allowedExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+                $extension = strtolower($file->getClientOriginalExtension());
+
+                if (! in_array($extension, $allowedExtensions)) {
+                    return back()->withErrors(['featured_video' => 'Invalid video format. Allowed formats: '.implode(', ', $allowedExtensions)])->withInput();
+                }
+
+                // Delete old video file if it exists and is a local file
+                if ($listing->featured_video_url && str_contains($listing->featured_video_url, '/storage/listings/videos/')) {
+                    $oldPath = str_replace('/storage/', '', parse_url($listing->featured_video_url, PHP_URL_PATH));
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                $path = $file->store('listings/videos', 'public');
+                $data['featured_video_url'] = Storage::disk('public')->url($path);
+            } catch (\Exception $e) {
+                \Log::error('Video upload exception', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return back()->withErrors(['featured_video' => 'Video upload failed: '.$e->getMessage()])->withInput();
+            }
+        }
 
         $listing->update($data);
 
@@ -220,5 +436,24 @@ class AdminListingController extends Controller
         $listing->update(['image_url' => null]);
 
         return response()->json(['success' => true, 'message' => 'Main image deleted successfully']);
+    }
+
+    public function deleteFeaturedVideo(Request $request, Listing $listing)
+    {
+        if (! $listing->featured_video_url) {
+            return response()->json(['error' => 'No featured video found'], 404);
+        }
+
+        // Delete file from storage if it's a local file
+        $url = $listing->featured_video_url;
+        if (str_contains($url, '/storage/listings/videos/')) {
+            $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
+            Storage::disk('public')->delete($path);
+        }
+
+        // Remove featured_video_url from listing
+        $listing->update(['featured_video_url' => null]);
+
+        return response()->json(['success' => true, 'message' => 'Featured video deleted successfully']);
     }
 }

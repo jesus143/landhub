@@ -132,25 +132,23 @@
                             <div class="space-y-4">
                                 <!-- Main Media Display -->
                                 <div class="relative group">
-                                    <div class="w-full h-96 bg-slate-200 dark:bg-slate-700 rounded-xl overflow-hidden shadow-lg">
+                                    <div class="w-full min-h-96 max-h-[600px] bg-slate-200 dark:bg-slate-700 rounded-xl overflow-hidden shadow-lg flex items-center justify-center">
                                         @foreach($allMedia as $index => $item)
-                                            <div id="media-main-{{ $index }}" class="media-main-item {{ $index === 0 ? '' : 'hidden' }}">
+                                            <div id="media-main-{{ $index }}" class="media-main-item w-full h-full flex items-center justify-center {{ $index === 0 ? '' : 'hidden' }}">
                                                 @if($item['type'] === 'video')
                                                     <video
-
                                                         src="{{ $item['url'] }}"
-                                                        class="w-full h-full object-cover hidden"
+                                                        class="w-full h-auto max-h-[600px] object-contain"
                                                         controls
                                                         preload="metadata"
                                                         onclick="openLightbox({{ $index }})"
                                                     ></video>
-                                                     <iframe width="100%" height="315" src="https://www.youtube.com/embed/MLATROF5KMk?si=8tzWrBQqcSO5kU04" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
                                                 @else
                                                     <img
                                                         src="{{ $item['url'] }}"
                                                         alt="{{ $listing->title }} - Media {{ $index + 1 }}"
-                                                        class="w-full h-full object-cover cursor-pointer transition-transform hover:scale-105"
+                                                        class="w-full h-auto max-h-[600px] object-contain cursor-pointer transition-transform hover:scale-105"
                                                         onclick="openLightbox({{ $index }})"
                                                         onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'"
                                                     >
@@ -229,7 +227,11 @@
                             @if($listing->featured_video_url)
                                 <h3 class="text-xl font-semibold mb-4">Featured Video</h3>
                                 <div class="w-full rounded-lg overflow-hidden shadow-lg">
-                                    <iframe width="100%" height="315" src="{{ $listing->getFeaturedVideoEmbedUrl() }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full"></iframe>
+                                    @if($listing->isFeaturedVideoYouTube())
+                                        <iframe width="100%" height="315" src="{{ $listing->getFeaturedVideoEmbedUrl() }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full"></iframe>
+                                    @else
+                                        <video src="{{ $listing->featured_video_url }}" controls class="w-full" style="max-height: 500px;"></video>
+                                    @endif
                                 </div>
                             @endif
 
@@ -252,13 +254,25 @@
                     <!-- Details -->
                     <div class="space-y-6">
                         <div>
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="px-3 py-1 bg-emerald-600 text-white text-sm font-semibold rounded-full">
-                                    {{ ucfirst(str_replace('_', ' ', $listing->status)) }}
-                                </span>
-                                <span class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-full">
-                                    {{ ucfirst($listing->category) }}
-                                </span>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-3 py-1 bg-emerald-600 text-white text-sm font-semibold rounded-full">
+                                        {{ ucfirst(str_replace('_', ' ', $listing->status)) }}
+                                    </span>
+                                    <span class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-full">
+                                        {{ ucfirst($listing->category) }}
+                                    </span>
+                                </div>
+                                @auth
+                                    @if(auth()->user()->is_admin ?? false)
+                                        <a href="{{ route('admin.listings.edit', $listing) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-colors">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            Edit Listing
+                                        </a>
+                                    @endif
+                                @endauth
                             </div>
                             <h1 class="text-4xl font-bold text-slate-900 dark:text-white mb-4">
                                 {{ $listing->title }}
@@ -273,8 +287,18 @@
                         </div>
 
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
-                            <div class="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
-                                ₱{{ number_format($listing->price, 0) }}
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="text-4xl font-bold text-emerald-600 dark:text-emerald-400">
+                                    ₱{{ number_format($listing->price, 0) }}
+                                </div>
+                                @if($listing->area && $listing->area > 0)
+                                    <div class="text-right">
+                                        <div class="text-sm text-slate-500 dark:text-slate-400 mb-1">Price per sqm</div>
+                                        <div class="text-xl font-semibold text-slate-700 dark:text-slate-300">
+                                            ₱{{ number_format($listing->price / $listing->area, 2) }}
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                             <div class="text-lg text-slate-600 dark:text-slate-400 mb-6">
                                 {{ number_format($listing->area, 0) }} sqm
@@ -300,6 +324,120 @@
                                     <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
                                         {{ $listing->description }}
                                     </p>
+                                </div>
+                            @endif
+
+                            @if($listing->is_titled || $listing->trees_plants || $listing->terrain_type || $listing->vehicle_accessible || $listing->additional_features || $listing->property_type || $listing->frontage || $listing->road_type || $listing->num_rooms || $listing->is_fenced || $listing->is_beachfront || $listing->beach_frontage || $listing->title_status || $listing->payment_terms)
+                                <div class="mb-6">
+                                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Property Details</h3>
+                                    
+                                    <div class="space-y-4">
+                                        @if($listing->property_type)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Property Type</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ $listing->property_type }}</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->title_status)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Title Status</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ $listing->title_status }}</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->is_titled)
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="font-semibold text-slate-900 dark:text-white">Titled Property</span>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->frontage)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Frontage</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ number_format($listing->frontage, 2) }} meters</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->road_type)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Road Type</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ $listing->road_type }}</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->num_rooms)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Number of Rooms</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ $listing->num_rooms }} room{{ $listing->num_rooms > 1 ? 's' : '' }}</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->is_fenced)
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="font-semibold text-slate-900 dark:text-white">Fenced</span>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->is_beachfront)
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="font-semibold text-slate-900 dark:text-white">Beachfront</span>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->beach_frontage)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Beach Frontage</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ number_format($listing->beach_frontage, 2) }} meters</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->trees_plants)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-2">Trees & Plants on Property</h4>
+                                                <div class="text-slate-600 dark:text-slate-400 whitespace-pre-line">{{ $listing->trees_plants }}</div>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->terrain_type)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Terrain Type</h4>
+                                                <p class="text-slate-600 dark:text-slate-400">{{ $listing->terrain_type }}</p>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->vehicle_accessible)
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="font-semibold text-slate-900 dark:text-white">Vehicle Accessible</span>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->additional_features)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-2">Additional Features & Amenities</h4>
+                                                <div class="text-slate-600 dark:text-slate-400 whitespace-pre-line">{{ $listing->additional_features }}</div>
+                                            </div>
+                                        @endif
+
+                                        @if($listing->payment_terms)
+                                            <div>
+                                                <h4 class="font-semibold text-slate-900 dark:text-white mb-2">Payment Terms</h4>
+                                                <div class="text-slate-600 dark:text-slate-400 whitespace-pre-line">{{ $listing->payment_terms }}</div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             @endif
 
