@@ -7,15 +7,44 @@
         @php
             $allMedia = $listing->getAllMedia();
             $firstMedia = collect($allMedia)->first();
+            $ogImage = null;
+            if ($firstMedia && $firstMedia['type'] === 'image') {
+                $ogImage = $firstMedia['url'];
+            } elseif ($listing->image_url) {
+                $ogImage = $listing->image_url;
+            }
+            // Convert relative URLs to absolute URLs
+            if ($ogImage && !filter_var($ogImage, FILTER_VALIDATE_URL)) {
+                $ogImage = url($ogImage);
+            }
+            $listingUrl = route('listings.show', ['listing' => $listing->id, 'slug' => \Illuminate\Support\Str::slug($listing->category) . '-' . \Illuminate\Support\Str::slug($listing->title) . '-' . \Illuminate\Support\Str::slug($listing->location)]);
+            $ogDescription = \Illuminate\Support\Str::limit($listing->description ?? $listing->title . ' in ' . $listing->location . '. ' . number_format($listing->price, 2) . ' PHP - ' . number_format($listing->area, 2) . ' sqm', 200);
         @endphp
-        <meta property="og:title" content="{{ $listing->title }}">
-        <meta property="og:description" content="{{ \Illuminate\Support\Str::limit($listing->description ?? $listing->title . ' - ' . $listing->location, 160) }}">
-        @if($firstMedia && $firstMedia['type'] === 'image')
-            <meta property="og:image" content="{{ $firstMedia['url'] }}">
-        @elseif($listing->image_url)
-            <meta property="og:image" content="{{ $listing->image_url }}">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ $listingUrl }}">
+        <meta property="og:title" content="{{ $listing->title }} - GetPHLand">
+        <meta property="og:description" content="{{ $ogDescription }}">
+        @if($ogImage)
+            <meta property="og:image" content="{{ $ogImage }}">
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="630">
+            <meta property="og:image:alt" content="{{ $listing->title }}">
         @endif
-        <title>{{ $listing->title }} - LandHub</title>
+        <meta property="og:site_name" content="GetPHLand">
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ $listingUrl }}">
+        <meta name="twitter:title" content="{{ $listing->title }} - GetPHLand">
+        <meta name="twitter:description" content="{{ $ogDescription }}">
+        @if($ogImage)
+            <meta name="twitter:image" content="{{ $ogImage }}">
+            <meta name="twitter:image:alt" content="{{ $listing->title }}">
+        @endif
+
+        <title>{{ $listing->title }} - GetPHLand</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
@@ -59,7 +88,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
+                            <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">GetPHLand</span>
                         </a>
                         <div class="flex items-center gap-4">
                             <a href="{{ route('listings.index') }}" class="px-5 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">

@@ -3,8 +3,26 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Search and filter land listings by location, price, category, and more. Find your perfect property with LandHub.">
-        <title>Search Listings - LandHub</title>
+        <meta name="description" content="Search and filter land listings by location, price, category, and more. Find your perfect property with GetPHLand.">
+        @php
+            $listingsUrl = route('listings.index');
+            $ogDescription = "Search and filter land listings by location, price, category, and more. Browse residential, agricultural, and commercial properties across the Philippines. Find your perfect property with GetPHLand.";
+        @endphp
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ $listingsUrl }}">
+        <meta property="og:title" content="Search Listings - GetPHLand">
+        <meta property="og:description" content="{{ $ogDescription }}">
+        <meta property="og:site_name" content="GetPHLand">
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ $listingsUrl }}">
+        <meta name="twitter:title" content="Search Listings - GetPHLand">
+        <meta name="twitter:description" content="{{ $ogDescription }}">
+
+        <title>Search Listings - GetPHLand</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
         <script src="{{ asset('tailwindcss.js') }}"></script>
@@ -29,7 +47,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
+                            <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">GetPHLand</span>
                         </a>
                         <div class="hidden md:flex items-center gap-4" >
                             @auth

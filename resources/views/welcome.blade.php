@@ -3,9 +3,26 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Find your perfect land with LandHub. Browse thousands of verified listings for residential, agricultural, and commercial properties across the Philippines.">
+        <meta name="description" content="Find your perfect land with GetPHLand. Browse thousands of verified listings for residential, agricultural, and commercial properties across the Philippines.">
+        @php
+            $homeUrl = route('welcome');
+            $ogDescription = "Find your perfect land with GetPHLand. Browse thousands of verified listings for residential, agricultural, and commercial properties across the Philippines. Search by location, price, and category.";
+        @endphp
 
-        <title>LandHub - Find Your Perfect Land</title>
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ $homeUrl }}">
+        <meta property="og:title" content="GetPHLand - Find Your Perfect Land">
+        <meta property="og:description" content="{{ $ogDescription }}">
+        <meta property="og:site_name" content="GetPHLand">
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ $homeUrl }}">
+        <meta name="twitter:title" content="GetPHLand - Find Your Perfect Land">
+        <meta name="twitter:description" content="{{ $ogDescription }}">
+
+        <title>GetPHLand - Find Your Perfect Land</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -36,7 +53,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                         </div>
-                        <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">LandHub</span>
+                        <span class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">GetPHLand</span>
                     </div>
 
                     <!-- Desktop Navigation -->
@@ -211,7 +228,7 @@
             <div class="max-w-7xl mx-auto px-6 lg:px-8">
                 <div class="text-center mb-16">
                     <h2 class="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
-                        Why Choose LandHub?
+                        Why Choose GetPHLand?
                     </h2>
                     <p class="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
                         Everything you need to find and purchase your perfect piece of land
@@ -312,7 +329,7 @@
                     Ready to Find Your Perfect Land?
                 </h2>
                 <p class="text-xl text-emerald-50 mb-10">
-                    Join thousands of satisfied customers who found their ideal property through LandHub
+                    Join thousands of satisfied customers who found their ideal property through GetPHLand
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
@@ -344,7 +361,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <span class="text-xl font-bold text-white">LandHub</span>
+                            <span class="text-xl font-bold text-white">GetPHLand</span>
                         </div>
                         <p class="text-slate-400 text-sm">
                             Your trusted platform for finding the perfect land. Browse, search, and discover your ideal property.
@@ -380,7 +397,7 @@
                 </div>
                 <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
                     <p class="text-slate-400 text-sm">
-                        © {{ date('Y') }} LandHub. All rights reserved.
+                        © {{ date('Y') }} GetPHLand. All rights reserved.
                     </p>
                     <div class="flex gap-4 mt-4 md:mt-0">
                         <a href="#" class="text-slate-400 hover:text-emerald-400 transition-colors">
