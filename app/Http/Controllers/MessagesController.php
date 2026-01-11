@@ -172,7 +172,7 @@ class MessagesController extends Controller
     /**
      * Create a new message (form to select recipient).
      */
-    public function create(Request $request, ?Listing $listing = null): View
+    public function create(Request $request, ?Listing $listing = null): View|RedirectResponse
     {
         $user = $request->user();
         $recipient = null;
@@ -180,6 +180,22 @@ class MessagesController extends Controller
         // If listing is provided, find owner: priority 1 = user_id, priority 2 = contact_email
         if ($listing) {
             $recipient = $listing->getOwner();
+
+            // If recipient exists, check if there's already a conversation
+            if ($recipient) {
+                $hasExistingConversation = Message::where(function ($query) use ($user, $recipient) {
+                    $query->where('sender_id', $user->id)
+                        ->where('receiver_id', $recipient->id);
+                })->orWhere(function ($query) use ($user, $recipient) {
+                    $query->where('sender_id', $recipient->id)
+                        ->where('receiver_id', $user->id);
+                })->exists();
+
+                // If conversation exists, redirect to the existing thread
+                if ($hasExistingConversation) {
+                    return redirect()->route('messages.show', $recipient);
+                }
+            }
         }
 
         return view('messages.create', [
