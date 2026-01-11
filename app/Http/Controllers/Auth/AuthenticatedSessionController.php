@@ -28,6 +28,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Redirect to intended URL or dashboard as fallback
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

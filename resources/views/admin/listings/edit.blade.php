@@ -17,6 +17,9 @@
     <form action="{{ route('admin.listings.update', $listing) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        @if(request('return_to') === 'show')
+            <input type="hidden" name="return_to" value="show">
+        @endif
 
         <div class="mb-2">
             <label class="block">Title</label>

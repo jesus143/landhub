@@ -391,10 +391,14 @@
                                 @foreach($listings as $listing)
                                     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                                         <div class="relative h-48 bg-slate-200 dark:bg-slate-700">
-                                            @if($listing->image_url)
-
-                                                <a href="{{ route('listings.show', ['listing' => $listing->id, 'slug' => \Illuminate\Support\Str::slug($listing->title)]) }}" class="cursor-pointer"  >
-                                                    <img src="{{ $listing->image_url }}" alt="{{ $listing->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'">
+                                            @php
+                                                $allMedia = $listing->getAllMedia();
+                                                $firstImage = collect($allMedia)->firstWhere('type', 'image');
+                                                $displayImage = $listing->image_url ?? ($firstImage['url'] ?? null);
+                                            @endphp
+                                            @if($displayImage)
+                                                <a href="{{ route('listings.show', ['listing' => $listing->id, 'slug' => \Illuminate\Support\Str::slug($listing->title)]) }}" class="cursor-pointer">
+                                                    <img src="{{ $displayImage }}" alt="{{ $listing->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600?text=Land+Listing'">
                                                 </a>
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center text-slate-400">

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Listing extends Model
 {
     protected $fillable = [
+        'user_id',
         'title',
         'description',
         'price',
@@ -129,8 +130,34 @@ class Listing extends Model
         return $this->hasMany(\App\Models\Comment::class);
     }
 
-    public function user()
+    /**
+     * User who created/owns the listing (primary owner).
+     */
+    public function owner()
     {
-        return $this->belongsTo(User::class, 'email');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the listing owner (user_id takes priority, fallback to contact_email).
+     */
+    public function getOwner(): ?User
+    {
+        // Priority 1: user_id (the person who created the listing)
+        if ($this->user_id) {
+            // Load the relationship if not already loaded
+            if (! $this->relationLoaded('owner')) {
+                $this->load('owner');
+            }
+
+            return $this->owner;
+        }
+
+        // Priority 2: contact_email (fallback)
+        if ($this->contact_email) {
+            return User::where('email', $this->contact_email)->first();
+        }
+
+        return null;
     }
 }

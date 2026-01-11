@@ -193,6 +193,9 @@ class AdminListingController extends Controller
             }
         }
 
+        // Set user_id to the current authenticated user (listing creator)
+        $data['user_id'] = $request->user()->id;
+
         Listing::create($data);
 
         return redirect()->route('admin.listings.index')->with('success', 'Listing created');
@@ -371,7 +374,23 @@ class AdminListingController extends Controller
             }
         }
 
+        // Preserve user_id (don't allow changing the original creator)
+        // If user_id is null, set it to current user (for old listings without user_id)
+        if (! $listing->user_id) {
+            $data['user_id'] = $request->user()->id;
+        } else {
+            // Remove user_id from data to preserve original creator
+            unset($data['user_id']);
+        }
+
         $listing->update($data);
+
+        // Redirect back to show page if coming from show page, otherwise to index
+        if ($request->has('return_to') && $request->get('return_to') === 'show') {
+            $slug = \Illuminate\Support\Str::slug($listing->category).'-'.\Illuminate\Support\Str::slug($listing->title).'-'.\Illuminate\Support\Str::slug($listing->location);
+
+            return redirect()->route('listings.show', ['listing' => $listing->id, 'slug' => $slug])->with('success', 'Listing updated');
+        }
 
         return redirect()->route('admin.listings.index')->with('success', 'Listing updated');
     }

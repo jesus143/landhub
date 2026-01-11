@@ -57,7 +57,7 @@ class MessagesController extends Controller
 
         foreach ($sentConversations as $conv) {
             $otherUserId = $conv->other_user_id;
-            if (!isset($conversationsMap[$otherUserId])) {
+            if (! isset($conversationsMap[$otherUserId])) {
                 $conversationsMap[$otherUserId] = (object) [
                     'other_user_id' => $otherUserId,
                     'last_message_at' => $conv->last_message_at,
@@ -75,7 +75,7 @@ class MessagesController extends Controller
 
         foreach ($receivedConversations as $conv) {
             $otherUserId = $conv->other_user_id;
-            if (!isset($conversationsMap[$otherUserId])) {
+            if (! isset($conversationsMap[$otherUserId])) {
                 $conversationsMap[$otherUserId] = (object) [
                     'other_user_id' => $otherUserId,
                     'last_message_at' => $conv->last_message_at,
@@ -96,6 +96,7 @@ class MessagesController extends Controller
         $conversations = collect($conversationsMap)
             ->map(function ($conv) {
                 $conv->other_user = \App\Models\User::find($conv->other_user_id);
+
                 return $conv;
             })
             ->sortByDesc('last_message_at')
@@ -120,6 +121,7 @@ class MessagesController extends Controller
                 $hasSentMessages = Message::where('sender_id', $user->id)
                     ->where('receiver_id', $conv->other_user_id)
                     ->exists();
+
                 return $hasSentMessages;
             });
         }
@@ -175,9 +177,9 @@ class MessagesController extends Controller
         $user = $request->user();
         $recipient = null;
 
-        // If listing is provided, try to find seller by email
-        if ($listing && $listing->contact_email) {
-            $recipient = User::where('email', $listing->contact_email)->first();
+        // If listing is provided, find owner: priority 1 = user_id, priority 2 = contact_email
+        if ($listing) {
+            $recipient = $listing->getOwner();
         }
 
         return view('messages.create', [
@@ -214,4 +216,3 @@ class MessagesController extends Controller
             ->with('success', 'Message sent successfully.');
     }
 }
-

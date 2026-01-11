@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 
 class ListingController extends Controller
 {
@@ -113,7 +112,7 @@ class ListingController extends Controller
                 });
             }
             $q->latest();
-        }, 'comments.user', 'comments.likes', 'user']);
+        }, 'comments.user', 'comments.likes', 'owner']);
 
         return view('listings.show', [
             'listing' => $listing,
