@@ -197,10 +197,12 @@
                                     </div>
                                 @endif
 
-                            <h3> Featured Video </h3>
-                            <div class=" w-full border-2">
-                                <iframe width="100%" height="315" src="https://www.youtube.com/embed/MLATROF5KMk?si=8tzWrBQqcSO5kU04" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                            </div>
+                            @if($listing->featured_video_url)
+                                <h3 class="text-xl font-semibold mb-4">Featured Video</h3>
+                                <div class="w-full rounded-lg overflow-hidden shadow-lg">
+                                    <iframe width="100%" height="315" src="{{ $listing->getFeaturedVideoEmbedUrl() }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full"></iframe>
+                                </div>
+                            @endif
 
 
                             </div>

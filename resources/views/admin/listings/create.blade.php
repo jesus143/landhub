@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.listings.store') }}" method="POST">
+    <form action="{{ route('admin.listings.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-2">
@@ -33,7 +33,7 @@
                 <input type="number" step="0.01" name="price" value="{{ old('price') }}" class="w-full border p-2" required>
             </div>
             <div class="mb-2">
-                <label class="block">Area</label>
+                <label class="block">Area <small> (Total Square Meters)</small></label>
                 <input type="number" step="0.01" name="area" value="{{ old('area') }}" class="w-full border p-2" required>
             </div>
         </div>
@@ -46,7 +46,11 @@
         <div class="grid grid-cols-2 gap-4">
             <div class="mb-2">
                 <label class="block">Category</label>
-                <input type="text" name="category" value="{{ old('category', 'residential') }}" class="w-full border p-2">
+                <select name="category" class="w-full border p-2" required>
+                    <option value="residential" {{ old('category', 'residential') === 'residential' ? 'selected' : '' }}>Residential</option>
+                    <option value="agricultural" {{ old('category') === 'agricultural' ? 'selected' : '' }}>Agricultural</option>
+                    <option value="commercial" {{ old('category') === 'commercial' ? 'selected' : '' }}>Commercial</option>
+                </select>
             </div>
             <div class="mb-2">
                 <label class="block">Status</label>
@@ -59,14 +63,27 @@
         </div>
 
         <div class="mb-2">
+            <label class="block">Main Image (Upload)</label>
+            <input type="file" name="main_image" accept="image/*" class="w-full border p-2">
+            <p class="text-sm text-gray-600 mt-1">Or provide an image URL below</p>
+        </div>
+
+        <div class="mb-2">
             <label class="block">Main Image URL</label>
-            <input type="url" name="image_url" value="{{ old('image_url') }}" class="w-full border p-2">
+            <input type="url" name="image_url" value="{{ old('image_url') }}" class="w-full border p-2" placeholder="https://example.com/image.jpg">
+            <p class="text-sm text-gray-600 mt-1">Leave empty if uploading an image above</p>
+        </div>
+
+        <div class="mb-2">
+            <label class="block">Additional Images (Upload)</label>
+            <input type="file" name="media_images[]" accept="image/*" multiple class="w-full border p-2">
+            <p class="text-sm text-gray-600 mt-1">You can select multiple images</p>
         </div>
 
         <div class="mb-2">
             <label class="block">Media JSON</label>
             <textarea name="media" class="w-full border p-2" placeholder='[{"type":"image","url":"https://..."},{"type":"video","url":"https://..."}]'>{{ old('media') }}</textarea>
-            <p class="text-sm text-gray-600">Provide an array of media items as JSON (type: image|video, url).</p>
+            <p class="text-sm text-gray-600">Provide an array of media items as JSON (type: image|video, url). Uploaded images above will be added automatically.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -88,6 +105,12 @@
         <div class="mb-2">
             <label class="block">Map Link</label>
             <input type="url" name="map_link" value="{{ old('map_link') }}" class="w-full border p-2">
+        </div>
+
+        <div class="mb-2">
+            <label class="block">Featured Video (YouTube URL)</label>
+            <input type="url" name="featured_video_url" value="{{ old('featured_video_url') }}" class="w-full border p-2" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/...">
+            <p class="text-sm text-gray-600 mt-1">Enter a YouTube video URL (full URL or short URL)</p>
         </div>
 
         <div class="grid grid-cols-3 gap-4">

@@ -20,6 +20,7 @@ class Listing extends Model
         'longitude',
         'nearby_landmarks',
         'map_link',
+        'featured_video_url',
         'contact_phone',
         'contact_email',
         'contact_fb_link',
@@ -52,6 +53,38 @@ class Listing extends Model
         }
 
         return $media;
+    }
+
+    /**
+     * Convert YouTube URL to embed format.
+     */
+    public function getFeaturedVideoEmbedUrl(): ?string
+    {
+        if (! $this->featured_video_url) {
+            return null;
+        }
+
+        $url = $this->featured_video_url;
+
+        // Extract video ID from various YouTube URL formats
+        $patterns = [
+            '/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/',
+            '/youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $url, $matches)) {
+                return 'https://www.youtube.com/embed/'.$matches[1];
+            }
+        }
+
+        // If already an embed URL, return as is
+        if (str_contains($url, 'youtube.com/embed/')) {
+            return $url;
+        }
+
+        // If no match, return original URL (might be invalid)
+        return $url;
     }
 
     /**

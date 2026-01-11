@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
         Route::get('listings/{listing}/edit', [\App\Http\Controllers\AdminListingController::class, 'edit'])->name('listings.edit');
         Route::put('listings/{listing}', [\App\Http\Controllers\AdminListingController::class, 'update'])->name('listings.update');
         Route::patch('listings/{listing}/status', [\App\Http\Controllers\AdminListingController::class, 'updateStatus'])->name('listings.updateStatus');
+        Route::delete('listings/{listing}/media', [\App\Http\Controllers\AdminListingController::class, 'deleteMedia'])->name('listings.deleteMedia');
+        Route::delete('listings/{listing}/main-image', [\App\Http\Controllers\AdminListingController::class, 'deleteMainImage'])->name('listings.deleteMainImage');
     });
 
     // Comment moderation (approve) - admin only check performed in controller
